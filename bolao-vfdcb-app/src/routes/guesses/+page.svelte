@@ -1,0 +1,317 @@
+<script lang="ts">
+    import { onMount } from "svelte";
+    import { goto } from "$app/navigation";
+    import { user, authLoading } from "$lib/auth";
+    import {
+        fetchUserGuesses,
+        submitGuess,
+        formatMatchTime,
+        statusLabel,
+        type GuessWithMatch,
+    } from "$lib/championship";
+
+    let loading = $state(true);
+    let guesses = $state<GuessWithMatch[]>([]);
+
+    // UI state
+    let editingMatchId = $state<string | null>(null);
+    let editHomeScore = $state<string>("");
+    let editAwayScore = $state<string>("");
+    let submitError = $state<string>("");
+    let submitSuccess = $state<string>("");
+    let isSubmitting = $state(false);
+
+    $effect(() => {
+        if (!$authLoading && !$user) {
+            goto("/login");
+        }
+    });
+
+    onMount(async () => {
+        try {
+            guesses = await fetchUserGuesses();
+        } catch (e: any) {
+            if (e.status === 401) {
+                goto("/login");
+                return;
+            }
+            console.error("Failed to load guesses", e);
+        } finally {
+            loading = false;
+        }
+    });
+
+    function getBadgeClass(status: string) {
+        if (status === "SCHEDULED") return "badge-scheduled";
+        if (status === "IN_PROGRESS") return "badge-live";
+        if (status === "FINISHED") return "badge-finished";
+        return "";
+    }
+
+    function startEdit(
+        matchId: string,
+        currentHome: number,
+        currentAway: number,
+    ) {
+        editingMatchId = matchId;
+        // if the guess is real (has an ID), populate form. If it's a dummy guess (id is empty), leave fields empty.
+        editHomeScore = currentHome >= 0 ? currentHome.toString() : "";
+        editAwayScore = currentAway >= 0 ? currentAway.toString() : "";
+        submitError = "";
+        submitSuccess = "";
+    }
+
+    function cancelEdit() {
+        editingMatchId = null;
+        submitError = "";
+    }
+
+    async function handleSubmitGuess(matchId: string) {
+        const hScore = parseInt(editHomeScore, 10);
+        const aScore = parseInt(editAwayScore, 10);
+
+        if (isNaN(hScore) || isNaN(aScore) || hScore < 0 || aScore < 0) {
+            submitError = "Por favor, insira placares válidos.";
+            return;
+        }
+
+        isSubmitting = true;
+        submitError = "";
+        submitSuccess = "";
+
+        try {
+            await submitGuess(matchId, hScore, aScore);
+
+            // Refresh data
+            guesses = await fetchUserGuesses();
+
+            submitSuccess = "Palpite salvo com sucesso!";
+            editingMatchId = null;
+
+            // Clear toast after 3s
+            setTimeout(() => {
+                submitSuccess = "";
+            }, 3000);
+        } catch (e: any) {
+            submitError =
+                e.message || "Falha ao salvar palpite. O jogo já começou?";
+        } finally {
+            isSubmitting = false;
+        }
+    }
+</script>
+
+<div class="container" style="padding-top: 3rem; padding-bottom: 4rem;">
+    <header style="margin-bottom: 3rem;">
+        <h1 class="animate-fade-in">Meus Palpites</h1>
+        <p class="animate-fade-in" style="font-size: 1.125rem;">
+            Seus palpites para todos os jogos do mundial. Você pode alterar os
+            placares até o horário de início de cada partida.
+        </p>
+    </header>
+
+    <!-- Global Toasts -->
+    {#if submitSuccess}
+        <div class="toast toast-success">
+            {submitSuccess}
+        </div>
+    {/if}
+
+    {#if loading}
+        <div
+            style="text-align: center; padding: 4rem; color: var(--color-text-muted);"
+        >
+            Carregando seus palpites...
+        </div>
+    {:else if guesses.length === 0}
+        <div
+            style="text-align: center; padding: 4rem; background: var(--color-surface); border-radius: var(--radius-lg); border: 1px solid var(--color-border);"
+        >
+            Nenhuma partida encontrada.
+        </div>
+    {:else}
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+            {#each guesses as item}
+                {@const isEditable = item.match.status === "SCHEDULED"}
+                {@const hasRealGuess =
+                    item.id &&
+                    item.id !== "00000000-0000-0000-0000-000000000000"}
+
+                <div class="card" style="padding: 1.5rem;">
+                    <!-- Header: Status and Time -->
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid var(--color-border); padding-bottom: 1rem;"
+                    >
+                        <span class="badge {getBadgeClass(item.match.status)}">
+                            {statusLabel(item.match.status)}
+                        </span>
+                        <span
+                            style="font-size: 0.875rem; color: var(--color-text-muted);"
+                        >
+                            {formatMatchTime(item.match.match_time)}
+                        </span>
+                    </div>
+
+                    <!-- Layout for teams and score/form -->
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center;"
+                    >
+                        <!-- Home Team -->
+                        <div
+                            style="flex: 1; text-align: right; padding-right: 1.5rem;"
+                        >
+                            <div style="font-weight: 700; font-size: 1.25rem;">
+                                {item.match.home_team.name}
+                            </div>
+                            <div
+                                style="color: var(--color-text-muted); font-size: 0.875rem;"
+                            >
+                                {item.match.home_team.code}
+                            </div>
+                        </div>
+
+                        <!-- Center: Form OR Display Score -->
+                        <div
+                            style="flex: 0 0 auto; min-width: 140px; text-align: center;"
+                        >
+                            {#if editingMatchId === item.match.id}
+                                <!-- EDIT MODE -->
+                                <div
+                                    style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;"
+                                >
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        max="99"
+                                        class="score-input"
+                                        bind:value={editHomeScore}
+                                        disabled={isSubmitting}
+                                    />
+                                    <span
+                                        style="color: var(--color-text-muted); font-weight: bold;"
+                                        >x</span
+                                    >
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        max="99"
+                                        class="score-input"
+                                        bind:value={editAwayScore}
+                                        disabled={isSubmitting}
+                                    />
+                                </div>
+                            {:else}
+                                <!-- DISPLAY MODE -->
+                                {#if hasRealGuess}
+                                    <div
+                                        class="score-display"
+                                        style="background: rgba(0,0,0,0.2); padding: 0.25rem 0.75rem; border-radius: var(--radius-md);"
+                                    >
+                                        {item.home_score} - {item.away_score}
+                                    </div>
+                                {:else}
+                                    <div
+                                        style="padding: 0.5rem; background: rgba(255,255,255,0.05); border-radius: var(--radius-sm); color: var(--color-text-muted); font-size: 0.875rem;"
+                                    >
+                                        Sem palpite
+                                    </div>
+                                {/if}
+                            {/if}
+                        </div>
+
+                        <!-- Away Team -->
+                        <div
+                            style="flex: 1; text-align: left; padding-left: 1.5rem;"
+                        >
+                            <div style="font-weight: 700; font-size: 1.25rem;">
+                                {item.match.away_team.name}
+                            </div>
+                            <div
+                                style="color: var(--color-text-muted); font-size: 0.875rem;"
+                            >
+                                {item.match.away_team.code}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Footer: Action buttons and points -->
+                    <div
+                        style="margin-top: 1.5rem; display: flex; justify-content: space-between; align-items: center;"
+                    >
+                        <!-- Match Result / Points -->
+                        <div
+                            style="font-size: 0.875rem; color: var(--color-text-muted);"
+                        >
+                            {#if item.match.status === "FINISHED"}
+                                <!-- Match is over, display points earned if any -->
+                                Pontos ganhos:
+                                <strong
+                                    style="color: var(--color-accent); font-size: 1.1rem;"
+                                >
+                                    {item.points !== null ? item.points : 0}
+                                </strong>
+                            {:else if item.match.status === "IN_PROGRESS"}
+                                Placar atual: {item.match.home_score ?? 0} x {item
+                                    .match.away_score ?? 0}
+                            {/if}
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div>
+                            {#if editingMatchId === item.match.id}
+                                <!-- Showing inline edit errors -->
+                                {#if submitError}
+                                    <div
+                                        style="color: var(--color-danger); font-size: 0.75rem; text-align: right; margin-bottom: 0.5rem;"
+                                    >
+                                        {submitError}
+                                    </div>
+                                {/if}
+                                <div
+                                    style="display: flex; gap: 0.5rem; justify-content: flex-end;"
+                                >
+                                    <button
+                                        class="btn"
+                                        style="background: transparent; color: var(--color-text-muted); padding: 0.5rem 1rem;"
+                                        onclick={cancelEdit}
+                                        disabled={isSubmitting}>Cancelar</button
+                                    >
+                                    <button
+                                        class="btn btn-primary"
+                                        style="padding: 0.5rem 1rem;"
+                                        onclick={() =>
+                                            handleSubmitGuess(item.match.id)}
+                                        disabled={isSubmitting}
+                                    >
+                                        {isSubmitting
+                                            ? "Salvando..."
+                                            : "Salvar"}
+                                    </button>
+                                </div>
+                            {:else if isEditable}
+                                <button
+                                    class="btn"
+                                    style="background: {hasRealGuess
+                                        ? 'transparent'
+                                        : 'var(--color-primary)'}; color: {hasRealGuess
+                                        ? 'var(--color-primary)'
+                                        : 'white'}; border: 1px solid var(--color-primary); padding: 0.5rem 1.5rem;"
+                                    onclick={() =>
+                                        startEdit(
+                                            item.match.id,
+                                            item.home_score,
+                                            item.away_score,
+                                        )}
+                                >
+                                    {hasRealGuess
+                                        ? "Alterar Palpite"
+                                        : "Fazer Palpite"}
+                                </button>
+                            {/if}
+                        </div>
+                    </div>
+                </div>
+            {/each}
+        </div>
+    {/if}
+</div>

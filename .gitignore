@@ -1,0 +1,19 @@
+**/*.DS_Store
+**/*.env
+**/*cookies.jar
+**/*.log
+
+# SvelteKit
+bolao-vfdcb-app/.svelte-kit
+bolao-vfdcb-app/build
+bolao-vfdcb-app/package
+**/*node_modules
+bolao-vfdcb-app/package-lock.json
+
+# Go
+bolao-vfdcb-service/bin/
+*.test
+*.out
+```
+start-bolao.sh
+test-backend.sh
