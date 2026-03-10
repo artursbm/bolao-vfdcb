@@ -29,6 +29,11 @@ func (s *Service) ListUpcomingMatches(ctx context.Context) ([]Match, error) {
 	return s.repo.ListUpcomingMatches(ctx)
 }
 
+// GetRanking returns the overall championship user ranking.
+func (s *Service) GetRanking(ctx context.Context) ([]UserRanking, error) {
+	return s.repo.GetRanking(ctx)
+}
+
 // SubmitGuess saves or updates a guess for the given match.
 // Returns ErrMatchAlreadyStarted if match_time is in the past.
 // TODO: verify when match started, if the guess was created before. If so should allow guess (race condition)

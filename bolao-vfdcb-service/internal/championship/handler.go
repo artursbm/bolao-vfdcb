@@ -59,6 +59,21 @@ func (h *Handler) GetMatches(w http.ResponseWriter, r *http.Request) {
 	h.respondJSON(w, http.StatusOK, matches)
 }
 
+// GetRanking returns the overall user ranking based on guess points.
+// GET /api/ranking  (authenticated)
+func (h *Handler) GetRanking(w http.ResponseWriter, r *http.Request) {
+	ranking, err := h.service.GetRanking(r.Context())
+	if err != nil {
+		h.logger.Error("failed to get ranking", "error", err)
+		h.respondError(w, http.StatusInternalServerError, "Internal server error")
+		return
+	}
+	if ranking == nil {
+		ranking = []UserRanking{}
+	}
+	h.respondJSON(w, http.StatusOK, ranking)
+}
+
 // GetGuesses returns all guesses the authenticated user has submitted.
 // GET /api/guesses  (authenticated)
 func (h *Handler) GetGuesses(w http.ResponseWriter, r *http.Request) {

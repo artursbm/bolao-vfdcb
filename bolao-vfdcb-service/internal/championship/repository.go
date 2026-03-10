@@ -25,6 +25,7 @@ type RepositoryInterface interface {
 	ListGuessesByMatch(ctx context.Context, matchID uuid.UUID) ([]Guess, error)
 	UpdateMatchResult(ctx context.Context, matchID uuid.UUID, homeScore, awayScore int) (*Match, error)
 	UpdateGuessPoints(ctx context.Context, guessID uuid.UUID, points int) error
+	GetRanking(ctx context.Context) ([]UserRanking, error)
 }
 
 // Repository implements RepositoryInterface against a PostgreSQL pool.
@@ -256,4 +257,33 @@ func (r *Repository) UpdateGuessPoints(ctx context.Context, guessID uuid.UUID, p
 		return fmt.Errorf("failed to update guess points: %w", err)
 	}
 	return nil
+}
+
+// GetRanking calculates the total points for all users across all their guesses.
+func (r *Repository) GetRanking(ctx context.Context) ([]UserRanking, error) {
+	query := `
+		SELECT
+			u.id as user_id,
+			u.name as user_name,
+			COALESCE(SUM(g.points), 0) as total_score
+		FROM users u
+		LEFT JOIN guesses g ON u.id = g.user_id
+		GROUP BY u.id, u.name
+		ORDER BY total_score DESC, u.name ASC`
+
+	rows, err := r.pool.Query(ctx, query)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch ranking: %w", err)
+	}
+	defer rows.Close()
+
+	var ranking []UserRanking
+	for rows.Next() {
+		var ur UserRanking
+		if err := rows.Scan(&ur.UserID, &ur.UserName, &ur.TotalScore); err != nil {
+			return nil, fmt.Errorf("failed to scan user ranking: %w", err)
+		}
+		ranking = append(ranking, ur)
+	}
+	return ranking, rows.Err()
 }

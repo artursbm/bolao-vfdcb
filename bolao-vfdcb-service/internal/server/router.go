@@ -30,9 +30,10 @@ func NewRouter(
 	// Public — list upcoming matches for the homepage
 	mux.HandleFunc("GET /api/matches", champHandler.GetMatches)
 
-	// Authenticated — user guesses
+	// Authenticated — user guesses & rankings
 	mux.Handle("GET /api/guesses", authMiddleware.RequireAuth(http.HandlerFunc(champHandler.GetGuesses)))
 	mux.Handle("POST /api/guesses", authMiddleware.RequireAuth(http.HandlerFunc(champHandler.SubmitGuess)))
+	mux.Handle("GET /api/ranking", authMiddleware.RequireAuth(http.HandlerFunc(champHandler.GetRanking)))
 
 	// Admin — finalize a match and trigger scoring
 	mux.Handle("POST /api/admin/match-results", authMiddleware.RequireAuth(http.HandlerFunc(champHandler.FinalizeMatch)))

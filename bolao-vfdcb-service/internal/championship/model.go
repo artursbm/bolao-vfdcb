@@ -61,3 +61,11 @@ type ScoringConfig struct {
 	Winner     int
 	Draw       int
 }
+
+// UserRanking represents a user's accumulated points in the championship.
+type UserRanking struct {
+	UserID     uuid.UUID `json:"user_id"`
+	UserName   string    `json:"user_name"`
+	TotalScore int       `json:"total_score"`
+}
+

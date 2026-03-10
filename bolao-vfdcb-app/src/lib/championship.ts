@@ -35,6 +35,12 @@ export interface GuessWithMatch extends Guess {
     match: Match;
 }
 
+export interface UserRanking {
+    user_id: string;
+    user_name: string;
+    total_score: number;
+}
+
 // ── API Functions ────────────────────────────────────────────────────────────
 
 export async function fetchUpcomingMatches(): Promise<Match[]> {
@@ -43,6 +49,10 @@ export async function fetchUpcomingMatches(): Promise<Match[]> {
 
 export async function fetchUserGuesses(): Promise<GuessWithMatch[]> {
     return fetchFromApi<GuessWithMatch[]>('/api/guesses');
+}
+
+export async function fetchRanking(): Promise<UserRanking[]> {
+    return fetchFromApi<UserRanking[]>('/api/ranking');
 }
 
 export async function submitGuess(matchId: string, homeScore: number, awayScore: number): Promise<Guess> {

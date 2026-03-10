@@ -24,14 +24,17 @@
 
 <div class="app-container">
 	<nav class="navbar">
-		<div class="navbar-brand">
-			<a href="/">Bolão VFDCB</a>
+		<div class="navbar-left">
+			<div class="navbar-brand">
+				<a href="/">Bolão VFDCB</a>
+			</div>
+			{#if $user}
+				<a href="/ranking" class="nav-link">Ranking</a>
+			{/if}
 		</div>
 		<div class="navbar-menu">
 			{#if $user}
-				<a href="/guesses" class="nav-link" style="margin-right: 1rem;"
-					>Meus Palpites</a
-				>
+				<a href="/guesses" class="nav-link">Meus Palpites</a>
 				<span class="user-greeting">Olá, {$user.name}</span>
 				<button class="btn-logout" onclick={handleLogout}>Sair</button>
 			{:else}
@@ -61,6 +64,12 @@
 		background-color: var(--color-surface);
 		border-bottom: 1px solid var(--color-border);
 		box-shadow: var(--shadow-sm);
+	}
+
+	.navbar-left {
+		display: flex;
+		align-items: center;
+		gap: 2rem;
 	}
 
 	.navbar-brand a {
