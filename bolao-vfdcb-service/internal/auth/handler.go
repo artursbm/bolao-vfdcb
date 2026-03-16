@@ -133,7 +133,7 @@ func (h *Handler) Logout(w http.ResponseWriter, r *http.Request) {
 		MaxAge:   -1,
 		HttpOnly: true,
 		Secure:   true,
-		SameSite: http.SameSiteLaxMode,
+		SameSite: http.SameSiteStrictMode,
 	})
 
 	w.WriteHeader(http.StatusNoContent)
@@ -163,7 +163,7 @@ func (h *Handler) setSessionCookie(w http.ResponseWriter, sessionID uuid.UUID) {
 		MaxAge:   int(h.service.sessionDuration.Seconds()),
 		HttpOnly: true,
 		Secure:   true,
-		SameSite: http.SameSiteLaxMode,
+		SameSite: http.SameSiteStrictMode,
 	})
 }
 
