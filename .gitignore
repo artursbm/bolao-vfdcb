@@ -17,3 +17,4 @@ bolao-vfdcb-service/bin/
 ```
 start-bolao.sh
 test-backend.sh
+*/**.gocache
