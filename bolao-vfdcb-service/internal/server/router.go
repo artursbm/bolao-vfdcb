@@ -3,6 +3,7 @@ package server
 import (
 	"log/slog"
 	"net/http"
+	"slices"
 	"time"
 
 	"github.com/artursbm/bolao-vfdcb-service/internal/auth"
@@ -14,6 +15,7 @@ func NewRouter(
 	authMiddleware *auth.Middleware,
 	champHandler *championship.Handler,
 	logger *slog.Logger,
+	allowedOrigins []string,
 ) http.Handler {
 	mux := http.NewServeMux()
 
@@ -41,7 +43,7 @@ func NewRouter(
 	// Apply global middleware
 	handler := loggingMiddleware(logger)(mux)
 	handler = recoveryMiddleware(logger)(handler)
-	handler = corsMiddleware()(handler)
+	handler = corsMiddleware(allowedOrigins)(handler)
 
 	return handler
 }
@@ -88,14 +90,14 @@ func recoveryMiddleware(logger *slog.Logger) func(http.Handler) http.Handler {
 }
 
 // corsMiddleware adds CORS headers
-func corsMiddleware() func(http.Handler) http.Handler {
+func corsMiddleware(allowedOrigins []string) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			origin := r.Header.Get("Origin")
 			if origin != "" {
-				w.Header().Set("Access-Control-Allow-Origin", origin)
-			} else {
-				w.Header().Set("Access-Control-Allow-Origin", "*")
+				if slices.Contains(allowedOrigins, origin) || slices.Contains(allowedOrigins, "*") {
+					w.Header().Set("Access-Control-Allow-Origin", origin)
+				}
 			}
 
 			w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")

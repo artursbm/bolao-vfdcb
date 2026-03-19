@@ -85,7 +85,7 @@ func main() {
 	champHandler := championship.NewHandler(champService, logger)
 
 	// Set up router
-	handler := server.NewRouter(authHandler, authMiddleware, champHandler, logger)
+	handler := server.NewRouter(authHandler, authMiddleware, champHandler, logger, cfg.AllowedOrigins)
 
 	// Create HTTP server
 	srv := &http.Server{

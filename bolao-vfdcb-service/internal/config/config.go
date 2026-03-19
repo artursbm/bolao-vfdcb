@@ -11,6 +11,7 @@ type Config struct {
 	CookieHashKey   string        `env:"COOKIE_HASH_KEY,required"`
 	ServerPort      string        `env:"SERVER_PORT" envDefault:"8080"`
 	SessionDuration time.Duration `env:"SESSION_DURATION" envDefault:"720h"` // 30 days
+	AllowedOrigins  []string      `env:"ALLOWED_ORIGINS" envDefault:"http://localhost:5173"`
 
 	// Scoring points (configurable per sweepstake rules)
 	ScoreExact      int `env:"SCORE_EXACT"       envDefault:"4"`
