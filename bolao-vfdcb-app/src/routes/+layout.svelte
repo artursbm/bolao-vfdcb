@@ -26,11 +26,16 @@
 	<nav class="navbar">
 		<div class="navbar-left">
 			<div class="navbar-brand">
-				<a href="/">Bolão VFDCB</a>
+				<a href="/">Home</a>
 			</div>
 			{#if $user}
 				<a href="/ranking" class="nav-link">Ranking</a>
 			{/if}
+		</div>
+		<div class="navbar-center">
+			<a href="/" class="logo-link">
+				<img src="/wm26.png" alt="Copa do Mundo 2026 Logo" class="navbar-logo" />
+			</a>
 		</div>
 		<div class="navbar-menu">
 			{#if $user}
@@ -70,6 +75,25 @@
 		display: flex;
 		align-items: center;
 		gap: 2rem;
+		flex: 1;
+	}
+
+	.navbar-center {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex: 1;
+	}
+
+	.navbar-logo {
+		height: 48px;
+		display: block;
+		object-fit: contain;
+		transition: transform 0.2s ease;
+	}
+
+	.navbar-logo:hover {
+		transform: scale(1.05);
 	}
 
 	.navbar-brand a {
@@ -84,6 +108,8 @@
 		display: flex;
 		align-items: center;
 		gap: 1.5rem;
+		flex: 1;
+		justify-content: flex-end;
 	}
 
 	.nav-link {

@@ -1,0 +1,33 @@
+server:
+  port: ${SERVER_PORT:8080}
+
+spring:
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/bolao}
+    username: ${DATABASE_USER:postgres}
+    password: ${DATABASE_PASSWORD:docker}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    show-sql: true
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+
+app:
+  security:
+    cookie-hash-key: ${COOKIE_HASH_KEY:change-me-to-32-byte-secret-key!}
+    session-duration-hours: 720
+  scoring:
+    exact: ${SCORE_EXACT:4}
+    winner-diff: ${SCORE_WINNER_DIFF:3}
+    winner: ${SCORE_WINNER:2}
+    draw: ${SCORE_DRAW:1}
+
+football-data:
+  api-token: ${FOOTBALL_DATA_API_TOKEN:}
+  competition-id: ${FOOTBALL_DATA_COMPETITION_ID:2000}

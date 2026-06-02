@@ -6,6 +6,7 @@ export interface Team {
     id: string;
     name: string;
     code: string;
+    crest?: string;
 }
 
 export interface Match {
@@ -15,7 +16,7 @@ export interface Match {
     match_time: string;
     home_score: number | null;
     away_score: number | null;
-    status: 'SCHEDULED' | 'IN_PROGRESS' | 'FINISHED';
+    status: 'TIMED' | 'IN_PROGRESS' | 'IN_PLAY' | 'PAUSED' | 'FINISHED';
     created_at: string;
     updated_at: string;
 }
@@ -83,8 +84,10 @@ export function formatMatchTime(isoDate: string): string {
 
 export function statusLabel(status: Match['status']): string {
     switch (status) {
-        case 'SCHEDULED': return 'Previsto';
+        case 'TIMED': return 'Agendado';
         case 'IN_PROGRESS': return 'Em andamento';
+        case 'IN_PLAY': return 'Em andamento';
+        case 'PAUSED': return 'Interrompido';
         case 'FINISHED': return 'Finalizado';
     }
 }

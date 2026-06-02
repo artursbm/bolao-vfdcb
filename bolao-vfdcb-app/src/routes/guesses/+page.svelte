@@ -42,7 +42,7 @@
     });
 
     function getBadgeClass(status: string) {
-        if (status === "SCHEDULED") return "badge-scheduled";
+        if (status === "TIMED") return "badge-scheduled";
         if (status === "IN_PROGRESS") return "badge-live";
         if (status === "FINISHED") return "badge-finished";
         return "";
@@ -132,7 +132,7 @@
     {:else}
         <div style="display: flex; flex-direction: column; gap: 1rem;">
             {#each guesses as item}
-                {@const isEditable = item.match.status === "SCHEDULED"}
+                {@const isEditable = item.match.status === "TIMED"}
                 {@const hasRealGuess =
                     item.id &&
                     item.id !== "00000000-0000-0000-0000-000000000000"}
@@ -164,9 +164,16 @@
                                 {item.match.home_team.name}
                             </div>
                             <div
-                                style="color: var(--color-text-muted); font-size: 0.875rem;"
+                                style="color: var(--color-text-muted); font-size: 0.875rem; display: flex; align-items: center; justify-content: flex-end; gap: 0.375rem;"
                             >
-                                {item.match.home_team.code}
+                                {#if item.match.home_team.crest}
+                                    <img
+                                        src={item.match.home_team.crest}
+                                        alt={item.match.home_team.name}
+                                        style="width: 1.25rem; height: 1.25rem; object-fit: contain;"
+                                    />
+                                {/if}
+                                <span>{item.match.home_team.code}</span>
                             </div>
                         </div>
 
@@ -227,9 +234,16 @@
                                 {item.match.away_team.name}
                             </div>
                             <div
-                                style="color: var(--color-text-muted); font-size: 0.875rem;"
+                                style="color: var(--color-text-muted); font-size: 0.875rem; display: flex; align-items: center; justify-content: flex-start; gap: 0.375rem;"
                             >
-                                {item.match.away_team.code}
+                                {#if item.match.away_team.crest}
+                                    <img
+                                        src={item.match.away_team.crest}
+                                        alt={item.match.away_team.name}
+                                        style="width: 1.25rem; height: 1.25rem; object-fit: contain;"
+                                    />
+                                {/if}
+                                <span>{item.match.away_team.code}</span>
                             </div>
                         </div>
                     </div>
