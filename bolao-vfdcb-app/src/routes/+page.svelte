@@ -233,7 +233,7 @@
             <div
                 style="display: flex; justify-content: center; align-items: flex-end; margin-bottom: 2rem;"
             >
-                <h2>Próximas Partidas</h2>
+                <h2>Partidas</h2>
             </div>
 
             {#if loading}
