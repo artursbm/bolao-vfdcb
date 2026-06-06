@@ -1,8 +1,8 @@
 package com.vfdcb.bolao.championship.client;
 
-import com.vfdcb.bolao.championship.config.FootballDataProperties;
 import com.vfdcb.bolao.championship.client.dto.CompetitionMatchesResponse;
 import com.vfdcb.bolao.championship.client.dto.CompetitionTeamsResponse;
+import com.vfdcb.bolao.championship.config.FootballDataProperties;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 

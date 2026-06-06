@@ -10,11 +10,12 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+      SQL_SLOW: true
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
-        format_sql: true
-    show-sql: true
+        format_sql: false
+    show-sql: false
   jackson:
     property-naming-strategy: SNAKE_CASE
 
