@@ -82,7 +82,7 @@ public class AuthController {
     private void setSessionCookie(HttpServletResponse response, UUID sessionId) {
         String signedValue = cookieHelper.sign(sessionId.toString(), cookieSecret);
         int maxAgeSeconds = sessionDurationHours * 3600;
-        
+
         // Use Set-Cookie header to support SameSite=Strict
         String cookieHeader = String.format("session=%s; Path=/; Max-Age=%d; HttpOnly; Secure; SameSite=Strict",
                 signedValue, maxAgeSeconds);

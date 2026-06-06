@@ -45,7 +45,7 @@ class ChampionshipServiceTest {
     void submitGuess_Success() {
         UUID userId = UUID.randomUUID();
         UUID matchId = UUID.randomUUID();
-        
+
         Match match = new Match(new Team(), new Team(), LocalDateTime.now().plusHours(1), MatchStatus.TIMED);
         match.setId(matchId);
 
@@ -64,14 +64,14 @@ class ChampionshipServiceTest {
     void submitGuess_MatchStarted() {
         UUID userId = UUID.randomUUID();
         UUID matchId = UUID.randomUUID();
-        
+
         Match match = new Match(new Team(), new Team(), LocalDateTime.now().minusHours(1), MatchStatus.IN_PROGRESS);
         match.setId(matchId);
 
         when(matchRepository.findById(matchId)).thenReturn(Optional.of(match));
 
-        assertThrows(MatchAlreadyStartedException.class, () -> 
-            championshipService.submitGuess(userId, matchId, 2, 1)
+        assertThrows(MatchAlreadyStartedException.class, () ->
+                championshipService.submitGuess(userId, matchId, 2, 1)
         );
     }
 
@@ -101,7 +101,7 @@ class ChampionshipServiceTest {
         assertEquals(3, guessWinnerDiff.getPoints());
         assertEquals(2, guessWinner.getPoints());
         assertEquals(0, guessWrong.getPoints());
-        
+
         verify(guessRepository, times(4)).save(any(Guess.class));
     }
 }

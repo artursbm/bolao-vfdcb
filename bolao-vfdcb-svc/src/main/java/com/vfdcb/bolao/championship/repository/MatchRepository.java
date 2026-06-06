@@ -11,6 +11,8 @@ import java.util.UUID;
 @Repository
 public interface MatchRepository extends JpaRepository<Match, UUID> {
     List<Match> findByStatusInOrderByMatchTimeAsc(List<MatchStatus> statuses);
+
     List<Match> findAllByOrderByMatchTimeAsc();
+
     java.util.Optional<Match> findByExternalId(Long externalId);
 }

@@ -25,7 +25,8 @@ public class Session {
     private LocalDateTime createdAt;
 
     // Constructors
-    public Session() {}
+    public Session() {
+    }
 
     public Session(UUID userId, LocalDateTime expiresAt) {
         this.userId = userId;
@@ -33,15 +34,35 @@ public class Session {
     }
 
     // Getters and Setters
-    public UUID getId() { return id; }
-    public void setId(UUID id) { this.id = id; }
+    public UUID getId() {
+        return id;
+    }
 
-    public UUID getUserId() { return userId; }
-    public void setUserId(UUID userId) { this.userId = userId; }
+    public void setId(UUID id) {
+        this.id = id;
+    }
 
-    public LocalDateTime getExpiresAt() { return expiresAt; }
-    public void setExpiresAt(LocalDateTime expiresAt) { this.expiresAt = expiresAt; }
+    public UUID getUserId() {
+        return userId;
+    }
 
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public void setUserId(UUID userId) {
+        this.userId = userId;
+    }
+
+    public LocalDateTime getExpiresAt() {
+        return expiresAt;
+    }
+
+    public void setExpiresAt(LocalDateTime expiresAt) {
+        this.expiresAt = expiresAt;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
 }

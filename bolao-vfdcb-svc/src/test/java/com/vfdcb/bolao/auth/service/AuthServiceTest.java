@@ -71,8 +71,8 @@ class AuthServiceTest {
         User existingUser = new User("Existing", "test@example.com", "hashed");
         when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(existingUser));
 
-        assertThrows(EmailAlreadyExistsException.class, () -> 
-            authService.signup("User 2", "test@example.com", "password456")
+        assertThrows(EmailAlreadyExistsException.class, () ->
+                authService.signup("User 2", "test@example.com", "password456")
         );
 
         verify(userRepository, never()).save(any(User.class));
@@ -103,11 +103,11 @@ class AuthServiceTest {
     void testLogin_WrongPassword() {
         String hashedPassword = BCrypt.hashpw("password123", BCrypt.gensalt());
         User user = new User("Test User", "test@example.com", hashedPassword);
-        
+
         when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
 
-        assertThrows(InvalidCredentialsException.class, () -> 
-            authService.login("test@example.com", "wrongpassword")
+        assertThrows(InvalidCredentialsException.class, () ->
+                authService.login("test@example.com", "wrongpassword")
         );
     }
 
@@ -115,8 +115,8 @@ class AuthServiceTest {
     void testLogin_NonexistentUser() {
         when(userRepository.findByEmail("noone@example.com")).thenReturn(Optional.empty());
 
-        assertThrows(InvalidCredentialsException.class, () -> 
-            authService.login("noone@example.com", "password123")
+        assertThrows(InvalidCredentialsException.class, () ->
+                authService.login("noone@example.com", "password123")
         );
     }
 
@@ -124,7 +124,7 @@ class AuthServiceTest {
     void testGetCurrentUser_Success() {
         UUID sessionId = UUID.randomUUID();
         UUID userId = UUID.randomUUID();
-        
+
         Session session = new Session(userId, LocalDateTime.now().plusHours(1));
         session.setId(sessionId);
 
@@ -144,11 +144,11 @@ class AuthServiceTest {
     void testGetCurrentUser_ExpiredSession() {
         UUID sessionId = UUID.randomUUID();
         Session session = new Session(UUID.randomUUID(), LocalDateTime.now().minusHours(1)); // Expired
-        
+
         when(sessionRepository.findById(sessionId)).thenReturn(Optional.of(session));
 
-        assertThrows(SessionExpiredException.class, () -> 
-            authService.getCurrentUser(sessionId)
+        assertThrows(SessionExpiredException.class, () ->
+                authService.getCurrentUser(sessionId)
         );
     }
 

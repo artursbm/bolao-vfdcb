@@ -23,7 +23,7 @@ public class AuthService {
     private final SessionRepository sessionRepository;
     private final int sessionDurationHours;
 
-    public AuthService(UserRepository userRepository, 
+    public AuthService(UserRepository userRepository,
                        SessionRepository sessionRepository,
                        @Value("${app.security.session-duration-hours:720}") int sessionDurationHours) {
         this.userRepository = userRepository;

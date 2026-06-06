@@ -1,7 +1,6 @@
 package com.vfdcb.bolao.championship.controller;
 
 import com.vfdcb.bolao.auth.model.User;
-import com.vfdcb.bolao.championship.dto.FinalizeMatchRequest;
 import com.vfdcb.bolao.championship.dto.SubmitGuessRequest;
 import com.vfdcb.bolao.championship.model.Guess;
 import com.vfdcb.bolao.championship.model.GuessWithMatch;
@@ -25,7 +24,7 @@ public class ChampionshipController {
     }
 
     @GetMapping("/matches")
-    public List<Match> getMatches() {
+    public List<Match> getMatches(@RequestParam Integer daysFromNow) {
         return championshipService.listUpcomingMatches();
     }
 
@@ -44,11 +43,6 @@ public class ChampionshipController {
     public Guess submitGuess(@Valid @RequestBody SubmitGuessRequest req, HttpServletRequest request) {
         User user = getUser(request);
         return championshipService.submitGuess(user.getId(), req.matchId(), req.homeScore(), req.awayScore());
-    }
-
-    @PostMapping("/admin/match-results")
-    public Match finalizeMatch(@Valid @RequestBody FinalizeMatchRequest req, HttpServletRequest request) {
-        return championshipService.finalizeMatch(req.matchId(), req.homeScore(), req.awayScore());
     }
 
     private User getUser(HttpServletRequest request) {

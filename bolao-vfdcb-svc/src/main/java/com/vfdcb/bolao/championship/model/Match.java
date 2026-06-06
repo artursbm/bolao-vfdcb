@@ -47,7 +47,8 @@ public class Match {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    public Match() {}
+    public Match() {
+    }
 
     public Match(Team homeTeam, Team awayTeam, LocalDateTime matchTime, MatchStatus status) {
         this.homeTeam = homeTeam;
@@ -57,33 +58,83 @@ public class Match {
     }
 
     // Getters and Setters
-    public UUID getId() { return id; }
-    public void setId(UUID id) { this.id = id; }
+    public UUID getId() {
+        return id;
+    }
 
-    public Long getExternalId() { return externalId; }
-    public void setExternalId(Long externalId) { this.externalId = externalId; }
+    public void setId(UUID id) {
+        this.id = id;
+    }
 
-    public Team getHomeTeam() { return homeTeam; }
-    public void setHomeTeam(Team homeTeam) { this.homeTeam = homeTeam; }
+    public Long getExternalId() {
+        return externalId;
+    }
 
-    public Team getAwayTeam() { return awayTeam; }
-    public void setAwayTeam(Team awayTeam) { this.awayTeam = awayTeam; }
+    public void setExternalId(Long externalId) {
+        this.externalId = externalId;
+    }
 
-    public LocalDateTime getMatchTime() { return matchTime; }
-    public void setMatchTime(LocalDateTime matchTime) { this.matchTime = matchTime; }
+    public Team getHomeTeam() {
+        return homeTeam;
+    }
 
-    public Integer getHomeScore() { return homeScore; }
-    public void setHomeScore(Integer homeScore) { this.homeScore = homeScore; }
+    public void setHomeTeam(Team homeTeam) {
+        this.homeTeam = homeTeam;
+    }
 
-    public Integer getAwayScore() { return awayScore; }
-    public void setAwayScore(Integer awayScore) { this.awayScore = awayScore; }
+    public Team getAwayTeam() {
+        return awayTeam;
+    }
 
-    public MatchStatus getStatus() { return status; }
-    public void setStatus(MatchStatus status) { this.status = status; }
+    public void setAwayTeam(Team awayTeam) {
+        this.awayTeam = awayTeam;
+    }
 
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public LocalDateTime getMatchTime() {
+        return matchTime;
+    }
 
-    public LocalDateTime getUpdatedAt() { return updatedAt; }
-    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
+    public void setMatchTime(LocalDateTime matchTime) {
+        this.matchTime = matchTime;
+    }
+
+    public Integer getHomeScore() {
+        return homeScore;
+    }
+
+    public void setHomeScore(Integer homeScore) {
+        this.homeScore = homeScore;
+    }
+
+    public Integer getAwayScore() {
+        return awayScore;
+    }
+
+    public void setAwayScore(Integer awayScore) {
+        this.awayScore = awayScore;
+    }
+
+    public MatchStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(MatchStatus status) {
+        this.status = status;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
 }

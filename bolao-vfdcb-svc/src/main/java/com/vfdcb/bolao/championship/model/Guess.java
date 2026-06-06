@@ -9,7 +9,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "guesses", uniqueConstraints = {
-    @UniqueConstraint(columnNames = {"user_id", "match_id"})
+        @UniqueConstraint(columnNames = {"user_id", "match_id"})
 })
 public class Guess {
 
@@ -40,7 +40,8 @@ public class Guess {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    public Guess() {}
+    public Guess() {
+    }
 
     public Guess(UUID userId, UUID matchId, Integer homeScore, Integer awayScore) {
         this.userId = userId;
@@ -50,27 +51,67 @@ public class Guess {
     }
 
     // Getters and Setters
-    public UUID getId() { return id; }
-    public void setId(UUID id) { this.id = id; }
+    public UUID getId() {
+        return id;
+    }
 
-    public UUID getUserId() { return userId; }
-    public void setUserId(UUID userId) { this.userId = userId; }
+    public void setId(UUID id) {
+        this.id = id;
+    }
 
-    public UUID getMatchId() { return matchId; }
-    public void setMatchId(UUID matchId) { this.matchId = matchId; }
+    public UUID getUserId() {
+        return userId;
+    }
 
-    public Integer getHomeScore() { return homeScore; }
-    public void setHomeScore(Integer homeScore) { this.homeScore = homeScore; }
+    public void setUserId(UUID userId) {
+        this.userId = userId;
+    }
 
-    public Integer getAwayScore() { return awayScore; }
-    public void setAwayScore(Integer awayScore) { this.awayScore = awayScore; }
+    public UUID getMatchId() {
+        return matchId;
+    }
 
-    public Integer getPoints() { return points; }
-    public void setPoints(Integer points) { this.points = points; }
+    public void setMatchId(UUID matchId) {
+        this.matchId = matchId;
+    }
 
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public Integer getHomeScore() {
+        return homeScore;
+    }
 
-    public LocalDateTime getUpdatedAt() { return updatedAt; }
-    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
+    public void setHomeScore(Integer homeScore) {
+        this.homeScore = homeScore;
+    }
+
+    public Integer getAwayScore() {
+        return awayScore;
+    }
+
+    public void setAwayScore(Integer awayScore) {
+        this.awayScore = awayScore;
+    }
+
+    public Integer getPoints() {
+        return points;
+    }
+
+    public void setPoints(Integer points) {
+        this.points = points;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
 }

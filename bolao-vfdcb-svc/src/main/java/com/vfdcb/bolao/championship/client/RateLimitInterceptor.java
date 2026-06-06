@@ -18,12 +18,12 @@ public class RateLimitInterceptor implements ClientHttpRequestInterceptor {
     @Override
     public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
         ClientHttpResponse response = execution.execute(request, body);
-        
+
         String availableHeader = response.getHeaders().getFirst("X-Requests-Available-Minute");
         if (availableHeader == null) {
             availableHeader = response.getHeaders().getFirst("X-RequestsAvailable");
         }
-        
+
         String resetHeader = response.getHeaders().getFirst("X-RequestCounter-Reset");
 
         if (availableHeader != null && resetHeader != null) {
@@ -31,7 +31,7 @@ public class RateLimitInterceptor implements ClientHttpRequestInterceptor {
                 int available = Integer.parseInt(availableHeader);
                 int resetSeconds = Integer.parseInt(resetHeader);
                 log.info("API Rate Limit: {} requests available. Resets in {} seconds.", available, resetSeconds);
-                
+
                 if (available <= 1 && resetSeconds > 0) {
                     log.warn("Rate limit approaching. Sleeping for {} seconds to avoid throttling...", resetSeconds + 1);
                     Thread.sleep((resetSeconds + 1) * 1000L);
@@ -40,7 +40,7 @@ public class RateLimitInterceptor implements ClientHttpRequestInterceptor {
                 log.error("Failed to parse rate limit headers", e);
             }
         }
-        
+
         return response;
     }
 }

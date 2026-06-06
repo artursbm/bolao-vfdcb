@@ -14,7 +14,7 @@ public class FootballDataClient {
 
     public FootballDataClient(FootballDataProperties properties, RestClient.Builder restClientBuilder, RateLimitInterceptor rateLimitInterceptor, com.fasterxml.jackson.databind.ObjectMapper defaultMapper) {
         this.properties = properties;
-        
+
         com.fasterxml.jackson.databind.ObjectMapper footballMapper = defaultMapper.copy()
                 .setPropertyNamingStrategy(com.fasterxml.jackson.databind.PropertyNamingStrategies.LOWER_CAMEL_CASE);
 

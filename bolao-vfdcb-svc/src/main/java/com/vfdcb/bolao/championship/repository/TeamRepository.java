@@ -10,5 +10,6 @@ import java.util.UUID;
 @Repository
 public interface TeamRepository extends JpaRepository<Team, UUID> {
     Optional<Team> findByExternalId(Long externalId);
+
     Optional<Team> findByCode(String code);
 }

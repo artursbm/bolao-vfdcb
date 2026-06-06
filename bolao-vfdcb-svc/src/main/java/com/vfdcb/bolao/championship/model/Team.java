@@ -31,7 +31,8 @@ public class Team {
     private LocalDateTime createdAt;
 
     // Constructors
-    public Team() {}
+    public Team() {
+    }
 
     public Team(String name, String code) {
         this.name = name;
@@ -39,21 +40,51 @@ public class Team {
     }
 
     // Getters and Setters
-    public UUID getId() { return id; }
-    public void setId(UUID id) { this.id = id; }
+    public UUID getId() {
+        return id;
+    }
 
-    public Long getExternalId() { return externalId; }
-    public void setExternalId(Long externalId) { this.externalId = externalId; }
+    public void setId(UUID id) {
+        this.id = id;
+    }
 
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
+    public Long getExternalId() {
+        return externalId;
+    }
 
-    public String getCode() { return code; }
-    public void setCode(String code) { this.code = code; }
+    public void setExternalId(Long externalId) {
+        this.externalId = externalId;
+    }
 
-    public String getCrest() { return crest; }
-    public void setCrest(String crest) { this.crest = crest; }
+    public String getName() {
+        return name;
+    }
 
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public String getCrest() {
+        return crest;
+    }
+
+    public void setCrest(String crest) {
+        this.crest = crest;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
 }

@@ -72,8 +72,8 @@ public class ChampionshipIntegrationTest {
 
     private Cookie getSignedCookie() throws Exception {
         String res = mockMvc.perform(post("/api/auth/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"email\":\"champ@test.com\", \"password\":\"password123\"}"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\":\"champ@test.com\", \"password\":\"password123\"}"))
                 .andReturn().getResponse().getCookie("session").getValue();
         return new Cookie("session", res);
     }
@@ -102,14 +102,14 @@ public class ChampionshipIntegrationTest {
         // Submit a guess first
         SubmitGuessRequest req = new SubmitGuessRequest(testMatch.getId(), 2, 1);
         mockMvc.perform(post("/api/guesses")
-                .cookie(authCookie)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(req)))
+                        .cookie(authCookie)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk());
 
         // Get guesses and verify flat shape (unwrapped)
         mockMvc.perform(get("/api/guesses")
-                .cookie(authCookie))
+                        .cookie(authCookie))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].home_score").value(2))
@@ -126,9 +126,9 @@ public class ChampionshipIntegrationTest {
         // 1. Submit Guess
         SubmitGuessRequest req = new SubmitGuessRequest(testMatch.getId(), 2, 1);
         mockMvc.perform(post("/api/guesses")
-                .cookie(authCookie)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(req)))
+                        .cookie(authCookie)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.home_score").value(2))
                 .andExpect(jsonPath("$.away_score").value(1));
@@ -136,15 +136,15 @@ public class ChampionshipIntegrationTest {
         // 2. Finalize Match
         FinalizeMatchRequest finReq = new FinalizeMatchRequest(testMatch.getId(), 2, 1);
         mockMvc.perform(post("/api/admin/match-results")
-                .cookie(authCookie)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(finReq)))
+                        .cookie(authCookie)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(finReq)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("FINISHED"));
 
         // 3. Get Ranking
         mockMvc.perform(get("/api/ranking")
-                .cookie(authCookie))
+                        .cookie(authCookie))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].user_name").value("Champ User"))

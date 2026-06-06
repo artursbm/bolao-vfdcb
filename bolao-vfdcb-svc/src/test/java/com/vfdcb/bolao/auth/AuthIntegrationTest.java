@@ -43,10 +43,10 @@ public class AuthIntegrationTest {
     void testSignupAndLoginFlow() throws Exception {
         // 1. Signup
         SignupRequest signupRequest = new SignupRequest("Integration User", "integration@test.com", "password123");
-        
+
         MvcResult signupResult = mockMvc.perform(post("/api/auth/signup")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(signupRequest)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(signupRequest)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.name").value("Integration User"))
                 .andExpect(jsonPath("$.email").value("integration@test.com"))
@@ -60,24 +60,24 @@ public class AuthIntegrationTest {
         LoginRequest loginRequest = new LoginRequest("integration@test.com", "password123");
 
         MvcResult loginResult = mockMvc.perform(post("/api/auth/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(loginRequest)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(loginRequest)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.email").value("integration@test.com"))
                 .andExpect(cookie().exists("session"))
                 .andReturn();
 
         String newSessionCookie = loginResult.getResponse().getCookie("session").getValue();
-        
+
         // 3. Me (Get Current User)
         mockMvc.perform(get("/api/auth/me")
-                .cookie(new jakarta.servlet.http.Cookie("session", newSessionCookie)))
+                        .cookie(new jakarta.servlet.http.Cookie("session", newSessionCookie)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.email").value("integration@test.com"));
 
         // 4. Logout
         mockMvc.perform(post("/api/auth/logout")
-                .cookie(new jakarta.servlet.http.Cookie("session", newSessionCookie)))
+                        .cookie(new jakarta.servlet.http.Cookie("session", newSessionCookie)))
                 .andExpect(status().isNoContent())
                 .andExpect(cookie().maxAge("session", 0));
     }
@@ -85,17 +85,17 @@ public class AuthIntegrationTest {
     @Test
     void testSignupDuplicateEmail() throws Exception {
         SignupRequest signupRequest = new SignupRequest("User 1", "duplicate@test.com", "password123");
-        
+
         mockMvc.perform(post("/api/auth/signup")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(signupRequest)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(signupRequest)))
                 .andExpect(status().isCreated());
 
         SignupRequest duplicateRequest = new SignupRequest("User 2", "duplicate@test.com", "password456");
 
         mockMvc.perform(post("/api/auth/signup")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(duplicateRequest)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(duplicateRequest)))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.error").value("Email already exists"));
     }
@@ -105,8 +105,8 @@ public class AuthIntegrationTest {
         LoginRequest loginRequest = new LoginRequest("nonexistent@test.com", "password123");
 
         mockMvc.perform(post("/api/auth/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(loginRequest)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(loginRequest)))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.error").value("Invalid credentials"));
     }

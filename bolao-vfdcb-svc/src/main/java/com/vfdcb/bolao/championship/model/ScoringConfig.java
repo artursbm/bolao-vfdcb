@@ -12,15 +12,35 @@ public class ScoringConfig {
     private int winner;
     private int draw;
 
-    public int getExact() { return exact; }
-    public void setExact(int exact) { this.exact = exact; }
+    public int getExact() {
+        return exact;
+    }
 
-    public int getWinnerDiff() { return winnerDiff; }
-    public void setWinnerDiff(int winnerDiff) { this.winnerDiff = winnerDiff; }
+    public void setExact(int exact) {
+        this.exact = exact;
+    }
 
-    public int getWinner() { return winner; }
-    public void setWinner(int winner) { this.winner = winner; }
+    public int getWinnerDiff() {
+        return winnerDiff;
+    }
 
-    public int getDraw() { return draw; }
-    public void setDraw(int draw) { this.draw = draw; }
+    public void setWinnerDiff(int winnerDiff) {
+        this.winnerDiff = winnerDiff;
+    }
+
+    public int getWinner() {
+        return winner;
+    }
+
+    public void setWinner(int winner) {
+        this.winner = winner;
+    }
+
+    public int getDraw() {
+        return draw;
+    }
+
+    public void setDraw(int draw) {
+        this.draw = draw;
+    }
 }

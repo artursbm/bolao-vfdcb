@@ -30,9 +30,7 @@ public class ChampionshipService {
     }
 
     public List<Match> listUpcomingMatches() {
-        return matchRepository.findByStatusInOrderByMatchTimeAsc(
-                List.of(MatchStatus.TIMED, MatchStatus.IN_PROGRESS)
-        );
+        return matchRepository.findByStatusInOrderByMatchTimeAsc(List.of(MatchStatus.TIMED, MatchStatus.IN_PROGRESS));
     }
 
     public List<UserRanking> getRanking() {
@@ -61,12 +59,12 @@ public class ChampionshipService {
 
     public List<GuessWithMatch> getUserGuesses(UUID userId) {
         List<Match> allMatches = matchRepository.findAllByOrderByMatchTimeAsc();
-        
+
         return allMatches.stream().map(match -> {
             Optional<Guess> guessOpt = guessRepository.findByUserIdAndMatchId(userId, match.getId());
             Guess guess = guessOpt.orElseGet(() -> {
                 Guess g = new Guess(userId, match.getId(), -1, -1);
-                g.setId(UUID.fromString("00000000-0000-0000-0000-000000000000"));
+                g.setId(UUID.randomUUID());
                 return g;
             });
             return new GuessWithMatch(guess, match);
