@@ -4,7 +4,8 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
 @Entity
@@ -27,7 +28,7 @@ public class Match {
     private Team awayTeam;
 
     @Column(name = "match_time", nullable = false)
-    private LocalDateTime matchTime;
+    private ZonedDateTime matchTime;
 
     @Column(name = "home_score")
     private Integer homeScore;
@@ -41,16 +42,16 @@ public class Match {
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;
+    private Instant updatedAt;
 
     public Match() {
     }
 
-    public Match(Team homeTeam, Team awayTeam, LocalDateTime matchTime, MatchStatus status) {
+    public Match(Team homeTeam, Team awayTeam, ZonedDateTime matchTime, MatchStatus status) {
         this.homeTeam = homeTeam;
         this.awayTeam = awayTeam;
         this.matchTime = matchTime;
@@ -90,11 +91,11 @@ public class Match {
         this.awayTeam = awayTeam;
     }
 
-    public LocalDateTime getMatchTime() {
+    public ZonedDateTime getMatchTime() {
         return matchTime;
     }
 
-    public void setMatchTime(LocalDateTime matchTime) {
+    public void setMatchTime(ZonedDateTime matchTime) {
         this.matchTime = matchTime;
     }
 
@@ -122,19 +123,19 @@ public class Match {
         this.status = status;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public Instant getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(Instant createdAt) {
         this.createdAt = createdAt;
     }
 
-    public LocalDateTime getUpdatedAt() {
+    public Instant getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(LocalDateTime updatedAt) {
+    public void setUpdatedAt(Instant updatedAt) {
         this.updatedAt = updatedAt;
     }
 }

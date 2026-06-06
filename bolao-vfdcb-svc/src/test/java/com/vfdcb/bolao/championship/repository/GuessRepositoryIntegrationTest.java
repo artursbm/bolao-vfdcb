@@ -13,7 +13,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -46,7 +46,7 @@ public class GuessRepositoryIntegrationTest {
         Team teamA = teamRepository.save(new Team("Test Team A", "TTA"));
         Team teamB = teamRepository.save(new Team("Test Team B", "TTB"));
 
-        LocalDateTime now = LocalDateTime.now();
+        ZonedDateTime now = ZonedDateTime.now();
         Match match1 = matchRepository.save(new Match(teamA, teamB, now.plusHours(1), MatchStatus.TIMED));
         Match match2 = matchRepository.save(new Match(teamB, teamA, now.plusHours(2), MatchStatus.TIMED));
 

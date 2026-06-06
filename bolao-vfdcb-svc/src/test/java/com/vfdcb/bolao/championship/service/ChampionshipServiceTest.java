@@ -10,7 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -46,7 +46,7 @@ class ChampionshipServiceTest {
         UUID userId = UUID.randomUUID();
         UUID matchId = UUID.randomUUID();
 
-        Match match = new Match(new Team(), new Team(), LocalDateTime.now().plusHours(1), MatchStatus.TIMED);
+        Match match = new Match(new Team(), new Team(), ZonedDateTime.now().plusHours(1), MatchStatus.TIMED);
         match.setId(matchId);
 
         when(matchRepository.findById(matchId)).thenReturn(Optional.of(match));
@@ -65,7 +65,7 @@ class ChampionshipServiceTest {
         UUID userId = UUID.randomUUID();
         UUID matchId = UUID.randomUUID();
 
-        Match match = new Match(new Team(), new Team(), LocalDateTime.now().minusHours(1), MatchStatus.IN_PROGRESS);
+        Match match = new Match(new Team(), new Team(), ZonedDateTime.now().minusHours(1), MatchStatus.IN_PLAY);
         match.setId(matchId);
 
         when(matchRepository.findById(matchId)).thenReturn(Optional.of(match));
@@ -78,7 +78,7 @@ class ChampionshipServiceTest {
     @Test
     void finalizeMatch_CalculatesPoints() {
         UUID matchId = UUID.randomUUID();
-        Match match = new Match(new Team(), new Team(), LocalDateTime.now().minusHours(2), MatchStatus.IN_PROGRESS);
+        Match match = new Match(new Team(), new Team(), ZonedDateTime.now().minusHours(2), MatchStatus.IN_PLAY);
         match.setId(matchId);
 
         when(matchRepository.findById(matchId)).thenReturn(Optional.of(match));

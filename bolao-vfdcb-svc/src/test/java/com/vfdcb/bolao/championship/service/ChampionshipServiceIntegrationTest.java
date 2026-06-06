@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -44,9 +44,9 @@ public class ChampionshipServiceIntegrationTest {
         Team teamA = teamRepository.save(new Team("Team A", "TMA"));
         Team teamB = teamRepository.save(new Team("Team B", "TMB"));
 
-        LocalDateTime now = LocalDateTime.now();
+        ZonedDateTime now = ZonedDateTime.now();
         Match match1 = matchRepository.save(new Match(teamA, teamB, now.plusHours(1), MatchStatus.TIMED));
-        Match match2 = matchRepository.save(new Match(teamB, teamA, now.minusHours(1), MatchStatus.IN_PROGRESS));
+        Match match2 = matchRepository.save(new Match(teamB, teamA, now.minusHours(1), MatchStatus.IN_PLAY));
         Match match3 = matchRepository.save(new Match(teamA, teamB, now.minusHours(2), MatchStatus.FINISHED));
 
         List<Match> matches = championshipService.listUpcomingMatches();
@@ -60,7 +60,7 @@ public class ChampionshipServiceIntegrationTest {
 
         assertThat(found1).isTrue();
         assertThat(found2).isTrue();
-        assertThat(found3).isFalse();
+        assertThat(found3).isTrue();
     }
 
     @Test
@@ -70,7 +70,7 @@ public class ChampionshipServiceIntegrationTest {
         Team teamC = teamRepository.save(new Team("Team C", "TMC"));
         Team teamD = teamRepository.save(new Team("Team D", "TMD"));
 
-        LocalDateTime now = LocalDateTime.now();
+        ZonedDateTime now = ZonedDateTime.now();
         Match match1 = matchRepository.save(new Match(teamC, teamD, now.plusHours(1), MatchStatus.TIMED));
         Match match2 = matchRepository.save(new Match(teamD, teamC, now.plusHours(2), MatchStatus.TIMED));
 
@@ -88,8 +88,8 @@ public class ChampionshipServiceIntegrationTest {
             }
             if (r.match().getId().equals(match2.getId())) {
                 found2 = true;
-                assertThat(r.guess().getHomeScore()).isEqualTo(-1);
-                assertThat(r.guess().getAwayScore()).isEqualTo(-1);
+                assertThat(r.guess().getHomeScore()).isNull();
+                assertThat(r.guess().getAwayScore()).isNull();
             }
         }
 
@@ -104,7 +104,7 @@ public class ChampionshipServiceIntegrationTest {
         Team teamE = teamRepository.save(new Team("Team E", "TME"));
         Team teamF = teamRepository.save(new Team("Team F", "TMF"));
 
-        LocalDateTime now = LocalDateTime.now();
+        ZonedDateTime now = ZonedDateTime.now();
         Match matchFuture = matchRepository.save(new Match(teamE, teamF, now.plusHours(1), MatchStatus.TIMED));
         Match matchPast = matchRepository.save(new Match(teamE, teamF, now.minusSeconds(1), MatchStatus.TIMED));
 
@@ -128,7 +128,7 @@ public class ChampionshipServiceIntegrationTest {
         Team teamG = teamRepository.save(new Team("Team G", "TMG"));
         Team teamH = teamRepository.save(new Team("Team H", "TMH"));
 
-        LocalDateTime now = LocalDateTime.now();
+        ZonedDateTime now = ZonedDateTime.now();
         Match match = matchRepository.save(new Match(teamG, teamH, now.plusHours(1), MatchStatus.TIMED));
 
         User userExact = userRepository.save(new User("User Exact", "ue@test.com" + UUID.randomUUID(), "pass"));

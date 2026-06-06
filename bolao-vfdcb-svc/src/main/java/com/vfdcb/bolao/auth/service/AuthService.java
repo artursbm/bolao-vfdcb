@@ -12,7 +12,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -42,7 +43,7 @@ public class AuthService {
         User user = new User(name, email, hashedPassword);
         user = userRepository.save(user);
 
-        LocalDateTime expiresAt = LocalDateTime.now().plusHours(sessionDurationHours);
+        Instant expiresAt = Instant.now().plus(sessionDurationHours, ChronoUnit.HOURS);
         Session session = new Session(user.getId(), expiresAt);
         session = sessionRepository.save(session);
 
@@ -58,7 +59,7 @@ public class AuthService {
             throw new InvalidCredentialsException();
         }
 
-        LocalDateTime expiresAt = LocalDateTime.now().plusHours(sessionDurationHours);
+        Instant expiresAt = Instant.now().plus(sessionDurationHours, ChronoUnit.HOURS);
         Session session = new Session(user.getId(), expiresAt);
         session = sessionRepository.save(session);
 
@@ -79,7 +80,7 @@ public class AuthService {
 
         Session session = sessionOpt.get();
 
-        if (LocalDateTime.now().isAfter(session.getExpiresAt())) {
+        if (Instant.now().isAfter(session.getExpiresAt())) {
             // Ideally clean up expired session, but readOnly transaction means we can't delete here unless we make it writable.
             // In Go it deleted it. We will make it writable to match.
             throw new SessionExpiredException();

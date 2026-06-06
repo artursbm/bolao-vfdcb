@@ -8,7 +8,8 @@ import com.vfdcb.bolao.championship.repository.MatchRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -30,7 +31,9 @@ public class ChampionshipService {
     }
 
     public List<Match> listUpcomingMatches() {
-        return matchRepository.findByStatusInOrderByMatchTimeAsc(List.of(MatchStatus.TIMED, MatchStatus.IN_PROGRESS));
+        return matchRepository
+                .findByStatusInAndMatchTimeAfterOrderByMatchTimeAsc(List.of(MatchStatus.TIMED, MatchStatus.IN_PLAY, MatchStatus.FINISHED),
+                        ZonedDateTime.now().toLocalDate().atStartOfDay(ZoneId.systemDefault()));
     }
 
     public List<UserRanking> getRanking() {
@@ -44,7 +47,7 @@ public class ChampionshipService {
         Match match = matchRepository.findById(matchId)
                 .orElseThrow(MatchNotFoundException::new);
 
-        if (!LocalDateTime.now().isBefore(match.getMatchTime()) || match.getStatus() != MatchStatus.TIMED) {
+        if (!ZonedDateTime.now().isBefore(match.getMatchTime()) || match.getStatus() != MatchStatus.TIMED) {
             throw new MatchAlreadyStartedException();
         }
 
@@ -63,7 +66,7 @@ public class ChampionshipService {
         return allMatches.stream().map(match -> {
             Optional<Guess> guessOpt = guessRepository.findByUserIdAndMatchId(userId, match.getId());
             Guess guess = guessOpt.orElseGet(() -> {
-                Guess g = new Guess(userId, match.getId(), -1, -1);
+                Guess g = new Guess(userId, match.getId(), null, null);
                 g.setId(UUID.randomUUID());
                 return g;
             });

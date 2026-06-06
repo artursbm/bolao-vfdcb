@@ -24,7 +24,7 @@ public class ChampionshipController {
     }
 
     @GetMapping("/matches")
-    public List<Match> getMatches(@RequestParam Integer daysFromNow) {
+    public List<Match> getMatches(@RequestParam(required = false) Integer daysFromNow) {
         return championshipService.listUpcomingMatches();
     }
 

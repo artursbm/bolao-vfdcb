@@ -9,7 +9,8 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -32,7 +33,7 @@ public class SessionRepositoryIntegrationTest {
         user = userRepository.save(user);
 
         // Create session
-        LocalDateTime expiresAt = LocalDateTime.now().plusHours(24);
+        Instant expiresAt = Instant.now().plus(24, ChronoUnit.HOURS);
         Session session = new Session(user.getId(), expiresAt);
         session = sessionRepository.save(session);
 

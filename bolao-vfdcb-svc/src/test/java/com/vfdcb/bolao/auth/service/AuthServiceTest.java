@@ -14,7 +14,8 @@ import org.mindrot.jbcrypt.BCrypt;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -125,7 +126,7 @@ class AuthServiceTest {
         UUID sessionId = UUID.randomUUID();
         UUID userId = UUID.randomUUID();
 
-        Session session = new Session(userId, LocalDateTime.now().plusHours(1));
+        Session session = new Session(userId, Instant.now().plus(1, ChronoUnit.HOURS));
         session.setId(sessionId);
 
         User user = new User("Test User", "test@example.com", "hashed");
@@ -143,7 +144,7 @@ class AuthServiceTest {
     @Test
     void testGetCurrentUser_ExpiredSession() {
         UUID sessionId = UUID.randomUUID();
-        Session session = new Session(UUID.randomUUID(), LocalDateTime.now().minusHours(1)); // Expired
+        Session session = new Session(UUID.randomUUID(), Instant.now().minus(1, ChronoUnit.HOURS)); // Expired
 
         when(sessionRepository.findById(sessionId)).thenReturn(Optional.of(session));
 

@@ -23,7 +23,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -81,7 +81,7 @@ public class ChampionshipIntegrationTest {
     private Match createMatch(int hoursOffset, MatchStatus status, String homeTeamName, String homeTeamCode, String awayTeamName, String awayTeamCode) {
         Team home = teamRepository.save(new Team(homeTeamName, homeTeamCode));
         Team away = teamRepository.save(new Team(awayTeamName, awayTeamCode));
-        return matchRepository.save(new Match(home, away, LocalDateTime.now().plusHours(hoursOffset), status));
+        return matchRepository.save(new Match(home, away, ZonedDateTime.now().plusHours(hoursOffset), status));
     }
 
     @Test
@@ -91,7 +91,7 @@ public class ChampionshipIntegrationTest {
 
         mockMvc.perform(get("/api/matches"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(1))); // Only TIMED / IN_PROGRESS
+                .andExpect(jsonPath("$", hasSize(2))); // Only TIMED / IN_PLAY
     }
 
     @Test

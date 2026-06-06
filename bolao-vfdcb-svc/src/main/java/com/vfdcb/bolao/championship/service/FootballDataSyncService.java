@@ -14,8 +14,6 @@ import com.vfdcb.bolao.championship.repository.TeamRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.Optional;
 
 @Service
@@ -101,7 +99,7 @@ public class FootballDataSyncService {
         match.setAwayTeam(awayTeam);
 
         if (dto.utcDate() != null) {
-            match.setMatchTime(LocalDateTime.ofInstant(dto.utcDate().toInstant(), ZoneId.systemDefault()));
+            match.setMatchTime(dto.utcDate());
         }
 
         if (dto.status() != null) {
