@@ -6,5 +6,5 @@ import java.time.ZonedDateTime;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record MatchDto(Long id, ZonedDateTime utcDate, String status, TeamDto homeTeam, TeamDto awayTeam,
-                       ScoreDto score, String stage) {
+                       ScoreDto score, String stage, ZonedDateTime lastUpdated) {
 }

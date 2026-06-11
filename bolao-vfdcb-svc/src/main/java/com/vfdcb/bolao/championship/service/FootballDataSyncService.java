@@ -34,7 +34,7 @@ public class FootballDataSyncService {
     public FootballDataSyncService(FootballDataClient client,
                                    FootballDataProperties properties,
                                    TeamRepository teamRepository,
-                                   MatchRepository matchRepository, 
+                                   MatchRepository matchRepository,
                                    MatchService matchService,
                                    MatchNotificationService notificationService) {
         this.client = client;
@@ -136,43 +136,47 @@ public class FootballDataSyncService {
         if (dto == null || dto.id() == null) return;
 
         Match match = matchRepository.findByExternalId(dto.id()).orElse(new Match());
-        boolean isNew = match.getId() == null;
-        Integer oldHomeScore = match.getHomeScore();
-        Integer oldAwayScore = match.getAwayScore();
-        MatchStatus oldStatus = match.getStatus();
+        if (match.getUpdatedAt().isBefore(dto.lastUpdated().toInstant())) {
+            boolean isNew = match.getId() == null;
+            Integer oldHomeScore = match.getHomeScore();
+            Integer oldAwayScore = match.getAwayScore();
+            MatchStatus oldStatus = match.getStatus();
 
-        match.setExternalId(dto.id());
-        match.setHomeTeam(homeTeam);
-        match.setAwayTeam(awayTeam);
+            match.setExternalId(dto.id());
+            match.setHomeTeam(homeTeam);
+            match.setAwayTeam(awayTeam);
 
-        if (dto.utcDate() != null) {
-            match.setMatchTime(dto.utcDate());
-        }
+            if (dto.utcDate() != null) {
+                match.setMatchTime(dto.utcDate());
+            }
 
-        if (dto.status() != null) {
-            try {
-                match.setStatus(MatchStatus.valueOf(dto.status()));
-            } catch (IllegalArgumentException e) {
+            if (dto.status() != null) {
+                try {
+                    match.setStatus(MatchStatus.valueOf(dto.status()));
+                } catch (IllegalArgumentException e) {
+                    match.setStatus(MatchStatus.TIMED);
+                }
+            } else {
                 match.setStatus(MatchStatus.TIMED);
             }
-        } else {
-            match.setStatus(MatchStatus.TIMED);
+
+            if (dto.score() != null && dto.score().getFullTime() != null) {
+                match.setHomeScore(dto.score().getFullTime().getHome());
+                match.setAwayScore(dto.score().getFullTime().getAway());
+            }
+
+            Match savedMatch = matchRepository.save(match);
+
+            boolean changed = isNew ||
+                    !java.util.Objects.equals(oldHomeScore, savedMatch.getHomeScore()) ||
+                    !java.util.Objects.equals(oldAwayScore, savedMatch.getAwayScore()) ||
+                    oldStatus != savedMatch.getStatus();
+
+            if (changed) {
+                notificationService.broadcastMatchUpdate(savedMatch);
+            }
         }
-
-        if (dto.score() != null && dto.score().getFullTime() != null) {
-            match.setHomeScore(dto.score().getFullTime().getHome());
-            match.setAwayScore(dto.score().getFullTime().getAway());
-        }
-
-        Match savedMatch = matchRepository.save(match);
-
-        boolean changed = isNew ||
-                !java.util.Objects.equals(oldHomeScore, savedMatch.getHomeScore()) ||
-                !java.util.Objects.equals(oldAwayScore, savedMatch.getAwayScore()) ||
-                oldStatus != savedMatch.getStatus();
-
-        if (changed) {
-            notificationService.broadcastMatchUpdate(savedMatch);
+            matchRepository.save(match);
         }
     }
 }
