@@ -31,12 +31,17 @@ public class MatchService {
             for (Match match : matches) {
                 var homeScore = match.getHomeScore();
                 var awayScore = match.getAwayScore();
+                
+                if (homeScore == null || awayScore == null) continue;
+
                 List<Guess> guesses = guessRepository.findByMatchId(match.getId());
 
                 for (Guess g : guesses) {
                     int pts = calculatePoints(g.getHomeScore(), g.getAwayScore(), homeScore, awayScore);
-                    g.setPoints(pts);
-                    guessRepository.save(g);
+                    if (g.getPoints() == null || g.getPoints() != pts) {
+                        g.setPoints(pts);
+                        guessRepository.save(g);
+                    }
                 }
             }
         }
