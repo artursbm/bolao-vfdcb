@@ -9,10 +9,12 @@ public class WebConfig implements WebMvcConfigurer {
 
     private final AuthInterceptor authInterceptor;
     private final AdminInterceptor adminInterceptor;
+    private final LogInterceptor logInterceptor;
 
-    public WebConfig(AuthInterceptor authInterceptor, AdminInterceptor adminInterceptor) {
+    public WebConfig(AuthInterceptor authInterceptor, AdminInterceptor adminInterceptor, LogInterceptor logInterceptor) {
         this.authInterceptor = authInterceptor;
         this.adminInterceptor = adminInterceptor;
+        this.logInterceptor = logInterceptor;
     }
 
     @Override
@@ -23,5 +25,7 @@ public class WebConfig implements WebMvcConfigurer {
 
         registry.addInterceptor(adminInterceptor)
                 .addPathPatterns("/api/admin/**");
+
+        registry.addInterceptor(logInterceptor);
     }
 }

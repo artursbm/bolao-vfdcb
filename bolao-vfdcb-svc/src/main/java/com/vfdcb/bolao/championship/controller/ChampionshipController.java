@@ -9,6 +9,8 @@ import com.vfdcb.bolao.championship.model.UserRanking;
 import com.vfdcb.bolao.championship.service.ChampionshipService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

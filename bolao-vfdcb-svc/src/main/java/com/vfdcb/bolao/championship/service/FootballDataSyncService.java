@@ -1,6 +1,7 @@
 package com.vfdcb.bolao.championship.service;
 
 import com.vfdcb.bolao.championship.client.FootballDataClient;
+import com.vfdcb.bolao.championship.client.RateLimitInterceptor;
 import com.vfdcb.bolao.championship.client.dto.CompetitionMatchesResponse;
 import com.vfdcb.bolao.championship.client.dto.CompetitionTeamsResponse;
 import com.vfdcb.bolao.championship.client.dto.MatchDto;
@@ -11,14 +12,18 @@ import com.vfdcb.bolao.championship.model.MatchStatus;
 import com.vfdcb.bolao.championship.model.Team;
 import com.vfdcb.bolao.championship.repository.MatchRepository;
 import com.vfdcb.bolao.championship.repository.TeamRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
-import org.springframework.scheduling.annotation.Scheduled;
 
 @Service
 public class FootballDataSyncService {
+
+    private static final Logger log = LoggerFactory.getLogger(FootballDataSyncService.class);
 
     private final FootballDataClient client;
     private final FootballDataProperties properties;
@@ -38,20 +43,26 @@ public class FootballDataSyncService {
     @Transactional
     public void loadWorldCupData() {
         CompetitionTeamsResponse teamsResponse = client.getCompetitionTeams(properties.getCompetitionId());
+        processTeams(teamsResponse);
+
+        CompetitionMatchesResponse response = client.getCompetitionMatches(properties.getCompetitionId());
+        processMatches(response);
+    }
+
+    private void processTeams(CompetitionTeamsResponse teamsResponse) {
         if (teamsResponse != null && teamsResponse.teams() != null) {
             for (TeamDto teamDto : teamsResponse.teams()) {
                 upsertTeam(teamDto);
             }
         }
-
-        CompetitionMatchesResponse response = client.getCompetitionMatches(properties.getCompetitionId());
-        processMatches(response);
     }
 
     public void processMatches(CompetitionMatchesResponse response) {
         if (response != null && response.matches() != null) {
             for (MatchDto matchDto : response.matches()
                     .stream().filter(m -> "GROUP_STAGE".equals(m.stage())).toList()) {
+                // this is not performatic, I'm querying teams every time to fill match data.
+                // TODO Could bring all teams once and map them via in-memory
                 Team homeTeam = getTeam(matchDto.homeTeam());
                 Team awayTeam = getTeam(matchDto.awayTeam());
                 upsertMatch(matchDto, homeTeam, awayTeam);
@@ -60,10 +71,17 @@ public class FootballDataSyncService {
     }
 
     @Transactional
-    @Scheduled(fixedDelayString = "${football-data.sync-delay:300000}") // Default 5 minutes
+    @Scheduled(fixedRateString = "${football-data.sync-delay:120000}") // Default 5 minutes
     public void syncMatchesScheduled() {
+        log.info("Starting Sync of matches");
+        if (teamRepository.countTeams() == 0) {
+            log.info("Teams not found, syncing teams first");
+            CompetitionTeamsResponse teamsResponse = client.getCompetitionTeams(properties.getCompetitionId());
+            processTeams(teamsResponse);
+        }
         CompetitionMatchesResponse response = client.getCompetitionMatches(properties.getCompetitionId());
         processMatches(response);
+        log.info("Finished Sync of matches");
     }
 
     private Team getTeam(TeamDto dto) {
