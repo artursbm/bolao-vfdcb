@@ -126,29 +126,32 @@ public class FootballDataSyncService {
         if (dto == null || dto.id() == null) return;
 
         Match match = matchRepository.findByExternalId(dto.id()).orElse(new Match());
-        match.setExternalId(dto.id());
-        match.setHomeTeam(homeTeam);
-        match.setAwayTeam(awayTeam);
+        if (match.getUpdatedAt().isBefore(dto.lastUpdated().toInstant())) {
 
-        if (dto.utcDate() != null) {
-            match.setMatchTime(dto.utcDate());
-        }
+            match.setExternalId(dto.id());
+            match.setHomeTeam(homeTeam);
+            match.setAwayTeam(awayTeam);
 
-        if (dto.status() != null) {
-            try {
-                match.setStatus(MatchStatus.valueOf(dto.status()));
-            } catch (IllegalArgumentException e) {
+            if (dto.utcDate() != null) {
+                match.setMatchTime(dto.utcDate());
+            }
+
+            if (dto.status() != null) {
+                try {
+                    match.setStatus(MatchStatus.valueOf(dto.status()));
+                } catch (IllegalArgumentException e) {
+                    match.setStatus(MatchStatus.TIMED);
+                }
+            } else {
                 match.setStatus(MatchStatus.TIMED);
             }
-        } else {
-            match.setStatus(MatchStatus.TIMED);
-        }
 
-        if (dto.score() != null && dto.score().getFullTime() != null) {
-            match.setHomeScore(dto.score().getFullTime().getHome());
-            match.setAwayScore(dto.score().getFullTime().getAway());
-        }
+            if (dto.score() != null && dto.score().getFullTime() != null) {
+                match.setHomeScore(dto.score().getFullTime().getHome());
+                match.setAwayScore(dto.score().getFullTime().getAway());
+            }
 
-        matchRepository.save(match);
+            matchRepository.save(match);
+        }
     }
 }
