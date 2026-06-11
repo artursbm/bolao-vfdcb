@@ -108,4 +108,40 @@ class FootballDataSyncServiceTest {
         assertEquals(2, savedMatch.getHomeScore());
         assertEquals(1, savedMatch.getAwayScore());
     }
+
+    @Test
+    void processMatches_shouldUpsertMatches() {
+        TeamDto homeTeamDto = new TeamDto(10L, "Brazil", "BRA", "http://bra.png");
+        TeamDto awayTeamDto = new TeamDto(20L, "Argentina", "ARG", "http://arg.png");
+
+        ScoreDto scoreDto = new ScoreDto();
+        ScoreDto.ScoreDetail scoreDetail = new ScoreDto.ScoreDetail();
+        scoreDetail.setHome(1);
+        scoreDetail.setAway(1);
+        scoreDto.setFullTime(scoreDetail);
+
+        MatchDto matchDto = new MatchDto(100L, ZonedDateTime.now(), "FINISHED", homeTeamDto, awayTeamDto, scoreDto, "GROUP_STAGE");
+        CompetitionMatchesResponse response = new CompetitionMatchesResponse(List.of(matchDto));
+
+        Team t1 = new Team("Brazil", "BRA");
+        t1.setExternalId(10L);
+        when(teamRepository.findByExternalId(10L)).thenReturn(Optional.of(t1));
+
+        Team t2 = new Team("Argentina", "ARG");
+        t2.setExternalId(20L);
+        when(teamRepository.findByExternalId(20L)).thenReturn(Optional.of(t2));
+
+        when(matchRepository.findByExternalId(100L)).thenReturn(Optional.empty());
+
+        syncService.processMatches(response);
+
+        ArgumentCaptor<Match> matchCaptor = ArgumentCaptor.forClass(Match.class);
+        verify(matchRepository).save(matchCaptor.capture());
+
+        Match savedMatch = matchCaptor.getValue();
+        assertEquals(100L, savedMatch.getExternalId());
+        assertEquals(MatchStatus.FINISHED, savedMatch.getStatus());
+        assertEquals(1, savedMatch.getHomeScore());
+        assertEquals(1, savedMatch.getAwayScore());
+    }
 }

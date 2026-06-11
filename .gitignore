@@ -14,3 +14,4 @@ start-bolao.sh
 test-backend.sh
 
 infra/
+**/*.tar.gz

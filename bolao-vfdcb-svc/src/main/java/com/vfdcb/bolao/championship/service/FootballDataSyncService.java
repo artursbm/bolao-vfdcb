@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+import org.springframework.scheduling.annotation.Scheduled;
 
 @Service
 public class FootballDataSyncService {
@@ -44,6 +45,10 @@ public class FootballDataSyncService {
         }
 
         CompetitionMatchesResponse response = client.getCompetitionMatches(properties.getCompetitionId());
+        processMatches(response);
+    }
+
+    public void processMatches(CompetitionMatchesResponse response) {
         if (response != null && response.matches() != null) {
             for (MatchDto matchDto : response.matches()
                     .stream().filter(m -> "GROUP_STAGE".equals(m.stage())).toList()) {
@@ -52,6 +57,13 @@ public class FootballDataSyncService {
                 upsertMatch(matchDto, homeTeam, awayTeam);
             }
         }
+    }
+
+    @Transactional
+    @Scheduled(fixedDelayString = "${football-data.sync-delay:300000}") // Default 5 minutes
+    public void syncMatchesScheduled() {
+        CompetitionMatchesResponse response = client.getCompetitionMatches(properties.getCompetitionId());
+        processMatches(response);
     }
 
     private Team getTeam(TeamDto dto) {
