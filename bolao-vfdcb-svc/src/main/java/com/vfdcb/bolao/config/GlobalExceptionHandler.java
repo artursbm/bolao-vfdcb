@@ -61,10 +61,20 @@ public class GlobalExceptionHandler {
         return Map.of("error", errors.toString());
     }
 
+    @ExceptionHandler(org.springframework.web.context.request.async.AsyncRequestNotUsableException.class)
+    @ResponseStatus(HttpStatus.OK)
+    public void handleAsyncRequestNotUsableException(org.springframework.web.context.request.async.AsyncRequestNotUsableException ex) {
+        // Client disconnected, do nothing
+    }
+
     @ExceptionHandler(Exception.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public Map<String, String> handleGenericException(Exception ex) {
+    public org.springframework.http.ResponseEntity<?> handleGenericException(Exception ex, jakarta.servlet.http.HttpServletRequest request) {
         ex.printStackTrace(); // Minimal logging
-        return Map.of("error", "Internal server error");
+        String acceptHeader = request.getHeader("Accept");
+        if (acceptHeader != null && acceptHeader.contains("text/event-stream")) {
+            return org.springframework.http.ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+        return org.springframework.http.ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("error", "Internal server error"));
     }
 }

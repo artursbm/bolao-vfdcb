@@ -25,7 +25,8 @@ public class MatchService {
     }
 
     @Transactional
-    public void finalizeMatches() {
+    public boolean finalizeMatches() {
+        boolean rankingChanged = false;
         var matches = matchRepository.findAllByStatus(MatchStatus.FINISHED);
         if (!matches.isEmpty()) {
             for (Match match : matches) {
@@ -41,10 +42,12 @@ public class MatchService {
                     if (g.getPoints() == null || g.getPoints() != pts) {
                         g.setPoints(pts);
                         guessRepository.save(g);
+                        rankingChanged = true;
                     }
                 }
             }
         }
+        return rankingChanged;
     }
 
     private int calculatePoints(int guessHome, int guessAway, int realHome, int realAway) {

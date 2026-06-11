@@ -29,16 +29,20 @@ public class FootballDataSyncService {
     private final TeamRepository teamRepository;
     private final MatchRepository matchRepository;
     private final MatchService matchService;
+    private final MatchNotificationService notificationService;
 
     public FootballDataSyncService(FootballDataClient client,
                                    FootballDataProperties properties,
                                    TeamRepository teamRepository,
-                                   MatchRepository matchRepository, MatchService matchService) {
+                                   MatchRepository matchRepository, 
+                                   MatchService matchService,
+                                   MatchNotificationService notificationService) {
         this.client = client;
         this.properties = properties;
         this.teamRepository = teamRepository;
         this.matchRepository = matchRepository;
         this.matchService = matchService;
+        this.notificationService = notificationService;
     }
 
     @Transactional
@@ -60,16 +64,22 @@ public class FootballDataSyncService {
 
     public void processMatches(CompetitionMatchesResponse response) {
         if (response != null && response.matches() != null) {
+            java.util.List<Team> allTeams = teamRepository.findAll();
+            java.util.Map<Long, Team> teamMap = allTeams.stream()
+                    .filter(t -> t.getExternalId() != null)
+                    .collect(java.util.stream.Collectors.toMap(Team::getExternalId, t -> t, (t1, t2) -> t1));
+
             for (MatchDto matchDto : response.matches()
                     .stream().filter(m -> "GROUP_STAGE".equals(m.stage())).toList()) {
-                // this is not performatic, I'm querying teams every time to fill match data.
-                // TODO Could bring all teams once and map them via in-memory
-                Team homeTeam = getTeam(matchDto.homeTeam());
-                Team awayTeam = getTeam(matchDto.awayTeam());
+                Team homeTeam = matchDto.homeTeam() != null ? teamMap.get(matchDto.homeTeam().id()) : null;
+                Team awayTeam = matchDto.awayTeam() != null ? teamMap.get(matchDto.awayTeam().id()) : null;
                 upsertMatch(matchDto, homeTeam, awayTeam);
             }
         }
-        matchService.finalizeMatches();
+        boolean rankingsChanged = matchService.finalizeMatches();
+        if (rankingsChanged) {
+            notificationService.broadcastRankingUpdate();
+        }
     }
 
     @Transactional
@@ -126,6 +136,11 @@ public class FootballDataSyncService {
         if (dto == null || dto.id() == null) return;
 
         Match match = matchRepository.findByExternalId(dto.id()).orElse(new Match());
+        boolean isNew = match.getId() == null;
+        Integer oldHomeScore = match.getHomeScore();
+        Integer oldAwayScore = match.getAwayScore();
+        MatchStatus oldStatus = match.getStatus();
+
         match.setExternalId(dto.id());
         match.setHomeTeam(homeTeam);
         match.setAwayTeam(awayTeam);
@@ -149,6 +164,15 @@ public class FootballDataSyncService {
             match.setAwayScore(dto.score().getFullTime().getAway());
         }
 
-        matchRepository.save(match);
+        Match savedMatch = matchRepository.save(match);
+
+        boolean changed = isNew ||
+                !java.util.Objects.equals(oldHomeScore, savedMatch.getHomeScore()) ||
+                !java.util.Objects.equals(oldAwayScore, savedMatch.getAwayScore()) ||
+                oldStatus != savedMatch.getStatus();
+
+        if (changed) {
+            notificationService.broadcastMatchUpdate(savedMatch);
+        }
     }
 }

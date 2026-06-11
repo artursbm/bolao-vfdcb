@@ -28,6 +28,7 @@ class FootballDataSyncServiceTest {
     private FootballDataProperties properties;
     private TeamRepository teamRepository;
     private MatchRepository matchRepository;
+    private MatchNotificationService matchNotificationService;
     private FootballDataSyncService syncService;
 
     @BeforeEach
@@ -36,6 +37,7 @@ class FootballDataSyncServiceTest {
         properties = mock(FootballDataProperties.class);
         teamRepository = mock(TeamRepository.class);
         matchRepository = mock(MatchRepository.class);
+        matchNotificationService = mock(MatchNotificationService.class);
         var config = new ScoringConfig();
         config.setExact(4);
         config.setWinnerDiff(3);
@@ -43,7 +45,7 @@ class FootballDataSyncServiceTest {
         config.setDraw(1);
         MatchService matchService = new MatchService(matchRepository, mock(GuessRepository.class), config);
 
-        syncService = new FootballDataSyncService(client, properties, teamRepository, matchRepository, matchService);
+        syncService = new FootballDataSyncService(client, properties, teamRepository, matchRepository, matchService, matchNotificationService);
     }
 
     @Test
