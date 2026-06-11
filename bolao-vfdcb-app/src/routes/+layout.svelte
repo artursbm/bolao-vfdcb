@@ -28,6 +28,7 @@
 			<div class="navbar-brand">
 				<a href="/">Home</a>
 			</div>
+			<a href="/regras" class="nav-link">Regras</a>
 			{#if $user}
 				<a href="/ranking" class="nav-link">Ranking</a>
 			{/if}
