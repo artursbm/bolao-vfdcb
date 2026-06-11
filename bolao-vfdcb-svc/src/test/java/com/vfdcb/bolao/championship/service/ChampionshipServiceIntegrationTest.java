@@ -123,39 +123,4 @@ public class ChampionshipServiceIntegrationTest {
                 .isInstanceOf(MatchAlreadyStartedException.class);
     }
 
-    @Test
-    void testIntegrationServiceFinalizeMatch() {
-        Team teamG = teamRepository.save(new Team("Team G", "TMG"));
-        Team teamH = teamRepository.save(new Team("Team H", "TMH"));
-
-        ZonedDateTime now = ZonedDateTime.now();
-        Match match = matchRepository.save(new Match(teamG, teamH, now.plusHours(1), MatchStatus.TIMED));
-
-        User userExact = userRepository.save(new User("User Exact", "ue@test.com" + UUID.randomUUID(), "pass"));
-        User userWinnerDiff = userRepository.save(new User("User WinnerDiff", "uwd@test.com" + UUID.randomUUID(), "pass"));
-        User userWinnerOnly = userRepository.save(new User("User WinnerOnly", "uwo@test.com" + UUID.randomUUID(), "pass"));
-        User userWrong = userRepository.save(new User("User Wrong", "uw@test.com" + UUID.randomUUID(), "pass"));
-
-        championshipService.submitGuess(userExact.getId(), match.getId(), 2, 1);
-        championshipService.submitGuess(userWinnerDiff.getId(), match.getId(), 3, 2);
-        championshipService.submitGuess(userWinnerOnly.getId(), match.getId(), 3, 0);
-        championshipService.submitGuess(userWrong.getId(), match.getId(), 1, 1);
-
-        // Finalize match with score 2-1
-        Match updatedMatch = championshipService.finalizeMatch(match.getId(), 2, 1);
-        assertThat(updatedMatch.getStatus()).isEqualTo(MatchStatus.FINISHED);
-        assertThat(updatedMatch.getHomeScore()).isEqualTo(2);
-
-        // Verify points
-        List<Guess> guesses = guessRepository.findByMatchId(match.getId());
-        assertThat(guesses).hasSize(4);
-
-        for (Guess g : guesses) {
-            assertThat(g.getPoints()).isNotNull();
-            if (g.getUserId().equals(userExact.getId())) assertThat(g.getPoints()).isEqualTo(4);
-            if (g.getUserId().equals(userWinnerDiff.getId())) assertThat(g.getPoints()).isEqualTo(3);
-            if (g.getUserId().equals(userWinnerOnly.getId())) assertThat(g.getPoints()).isEqualTo(2);
-            if (g.getUserId().equals(userWrong.getId())) assertThat(g.getPoints()).isEqualTo(0);
-        }
-    }
 }

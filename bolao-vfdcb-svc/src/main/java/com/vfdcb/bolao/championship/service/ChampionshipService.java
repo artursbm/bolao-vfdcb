@@ -20,14 +20,11 @@ public class ChampionshipService {
 
     private final MatchRepository matchRepository;
     private final GuessRepository guessRepository;
-    private final ScoringConfig scoringConfig;
 
     public ChampionshipService(MatchRepository matchRepository,
-                               GuessRepository guessRepository,
-                               ScoringConfig scoringConfig) {
+                               GuessRepository guessRepository) {
         this.matchRepository = matchRepository;
         this.guessRepository = guessRepository;
-        this.scoringConfig = scoringConfig;
     }
 
     public List<Match> listUpcomingMatches() {
@@ -74,51 +71,4 @@ public class ChampionshipService {
         }).collect(Collectors.toList());
     }
 
-    @Transactional
-    public Match finalizeMatch(UUID matchId, int homeScore, int awayScore) {
-        Match match = matchRepository.findById(matchId)
-                .orElseThrow(MatchNotFoundException::new);
-
-        match.setHomeScore(homeScore);
-        match.setAwayScore(awayScore);
-        match.setStatus(MatchStatus.FINISHED);
-        match = matchRepository.save(match);
-
-        List<Guess> guesses = guessRepository.findByMatchId(matchId);
-        for (Guess g : guesses) {
-            int pts = calculatePoints(g.getHomeScore(), g.getAwayScore(), homeScore, awayScore);
-            g.setPoints(pts);
-            guessRepository.save(g);
-        }
-
-        return match;
-    }
-
-    private int calculatePoints(int guessHome, int guessAway, int realHome, int realAway) {
-        if (guessHome == realHome && guessAway == realAway) {
-            return scoringConfig.getExact();
-        }
-
-        int guessDiff = guessHome - guessAway;
-        int realDiff = realHome - realAway;
-
-        if (realDiff == 0) {
-            if (guessDiff == 0) {
-                return scoringConfig.getDraw();
-            }
-            return 0;
-        } else {
-            int guessWinner = Integer.signum(guessDiff);
-            int realWinner = Integer.signum(realDiff);
-
-            if (guessWinner != realWinner) {
-                return 0;
-            }
-
-            if (guessDiff == realDiff) {
-                return scoringConfig.getWinnerDiff();
-            }
-            return scoringConfig.getWinner();
-        }
-    }
 }

@@ -1,7 +1,6 @@
 package com.vfdcb.bolao.championship.service;
 
 import com.vfdcb.bolao.championship.client.FootballDataClient;
-import com.vfdcb.bolao.championship.client.RateLimitInterceptor;
 import com.vfdcb.bolao.championship.client.dto.CompetitionMatchesResponse;
 import com.vfdcb.bolao.championship.client.dto.CompetitionTeamsResponse;
 import com.vfdcb.bolao.championship.client.dto.MatchDto;
@@ -29,15 +28,17 @@ public class FootballDataSyncService {
     private final FootballDataProperties properties;
     private final TeamRepository teamRepository;
     private final MatchRepository matchRepository;
+    private final MatchService matchService;
 
     public FootballDataSyncService(FootballDataClient client,
                                    FootballDataProperties properties,
                                    TeamRepository teamRepository,
-                                   MatchRepository matchRepository) {
+                                   MatchRepository matchRepository, MatchService matchService) {
         this.client = client;
         this.properties = properties;
         this.teamRepository = teamRepository;
         this.matchRepository = matchRepository;
+        this.matchService = matchService;
     }
 
     @Transactional
@@ -68,6 +69,7 @@ public class FootballDataSyncService {
                 upsertMatch(matchDto, homeTeam, awayTeam);
             }
         }
+        matchService.finalizeMatches();
     }
 
     @Transactional

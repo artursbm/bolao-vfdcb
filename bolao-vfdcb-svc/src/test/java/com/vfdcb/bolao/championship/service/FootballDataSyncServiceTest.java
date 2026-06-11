@@ -5,7 +5,9 @@ import com.vfdcb.bolao.championship.client.dto.*;
 import com.vfdcb.bolao.championship.config.FootballDataProperties;
 import com.vfdcb.bolao.championship.model.Match;
 import com.vfdcb.bolao.championship.model.MatchStatus;
+import com.vfdcb.bolao.championship.model.ScoringConfig;
 import com.vfdcb.bolao.championship.model.Team;
+import com.vfdcb.bolao.championship.repository.GuessRepository;
 import com.vfdcb.bolao.championship.repository.MatchRepository;
 import com.vfdcb.bolao.championship.repository.TeamRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,7 +36,14 @@ class FootballDataSyncServiceTest {
         properties = mock(FootballDataProperties.class);
         teamRepository = mock(TeamRepository.class);
         matchRepository = mock(MatchRepository.class);
-        syncService = new FootballDataSyncService(client, properties, teamRepository, matchRepository);
+        var config = new ScoringConfig();
+        config.setExact(4);
+        config.setWinnerDiff(3);
+        config.setWinner(2);
+        config.setDraw(1);
+        MatchService matchService = new MatchService(matchRepository, mock(GuessRepository.class), config);
+
+        syncService = new FootballDataSyncService(client, properties, teamRepository, matchRepository, matchService);
     }
 
     @Test

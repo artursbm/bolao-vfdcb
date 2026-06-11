@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vfdcb.bolao.auth.repository.UserRepository;
 import com.vfdcb.bolao.auth.service.AuthResult;
 import com.vfdcb.bolao.auth.service.AuthService;
-import com.vfdcb.bolao.championship.dto.FinalizeMatchRequest;
 import com.vfdcb.bolao.championship.dto.SubmitGuessRequest;
 import com.vfdcb.bolao.championship.model.Match;
 import com.vfdcb.bolao.championship.model.MatchStatus;
@@ -12,6 +11,7 @@ import com.vfdcb.bolao.championship.model.Team;
 import com.vfdcb.bolao.championship.repository.GuessRepository;
 import com.vfdcb.bolao.championship.repository.MatchRepository;
 import com.vfdcb.bolao.championship.repository.TeamRepository;
+import com.vfdcb.bolao.championship.service.MatchService;
 import com.vfdcb.bolao.config.TestcontainersConfiguration;
 import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.BeforeEach;
@@ -59,6 +59,9 @@ public class ChampionshipIntegrationTest {
 
     @Autowired
     private AuthService authService;
+
+    @Autowired
+    private MatchService matchService;
 
     @BeforeEach
     void setup() {
@@ -145,13 +148,11 @@ public class ChampionshipIntegrationTest {
                 .andExpect(jsonPath("$.away_score").value(1));
 
         // 2. Finalize Match
-        FinalizeMatchRequest finReq = new FinalizeMatchRequest(testMatch.getId(), 2, 1);
-        mockMvc.perform(post("/api/admin/match-results")
-                        .cookie(adminCookie)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(finReq)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value("FINISHED"));
+        testMatch.setHomeScore(2);
+        testMatch.setAwayScore(1);
+        testMatch.setStatus(MatchStatus.FINISHED);
+        matchRepository.save(testMatch);
+        matchService.finalizeMatches();
 
         // 3. Get Ranking
         mockMvc.perform(get("/api/ranking")
