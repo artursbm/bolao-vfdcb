@@ -1,5 +1,3 @@
-export const API_BASE_URL = 'http://localhost:8080';
-
 export class ApiError extends Error {
     constructor(public status: number, message: string) {
         super(message);
@@ -28,7 +26,7 @@ export async function fetchFromApi<T>(endpoint: string, options?: RequestInit): 
     const path = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
 
     try {
-        const response = await fetch(`${API_BASE_URL}${path}`, {
+        const response = await fetch(path, {
             ...options,
             credentials: 'include',
             headers: {

@@ -121,6 +121,14 @@ public class ChampionshipIntegrationTest {
     @Test
     void testSubmitGuessAndRankingFlow() throws Exception {
         Cookie authCookie = getSignedCookie();
+        
+        authService.signup("Admin", "admin@vfdcb.com", "admin123");
+        String adminCookieValue = mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\":\"admin@vfdcb.com\", \"password\":\"admin123\"}"))
+                .andReturn().getResponse().getCookie("session").getValue();
+        Cookie adminCookie = new Cookie("session", adminCookieValue);
+
         Match testMatch = createMatch(1, MatchStatus.TIMED, "Brazil", "BRA", "Argentina", "ARG");
 
         // 1. Submit Guess
@@ -136,7 +144,7 @@ public class ChampionshipIntegrationTest {
         // 2. Finalize Match
         FinalizeMatchRequest finReq = new FinalizeMatchRequest(testMatch.getId(), 2, 1);
         mockMvc.perform(post("/api/admin/match-results")
-                        .cookie(authCookie)
+                        .cookie(adminCookie)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(finReq)))
                 .andExpect(status().isOk())
@@ -146,7 +154,7 @@ public class ChampionshipIntegrationTest {
         mockMvc.perform(get("/api/ranking")
                         .cookie(authCookie))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$", hasSize(2))) // Champ User + Admin
                 .andExpect(jsonPath("$[0].user_name").value("Champ User"))
                 .andExpect(jsonPath("$[0].total_score").value(4)); // Exact score = 4 pts
     }

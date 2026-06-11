@@ -10,11 +10,7 @@ bolao-vfdcb-app/package
 **/*node_modules
 bolao-vfdcb-app/package-lock.json
 
-# Go
-bolao-vfdcb-service/bin/
-*.test
-*.out
-```
 start-bolao.sh
 test-backend.sh
-*/**.gocache
+
+infra/

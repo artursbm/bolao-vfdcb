@@ -1,5 +1,5 @@
 server:
-  port: ${SERVER_PORT:8080}
+  port: 8080
 
 spring:
   datasource:
@@ -7,6 +7,13 @@ spring:
     username: ${DATABASE_USER:postgres}
     password: ${DATABASE_PASSWORD:docker}
     driver-class-name: org.postgresql.Driver
+    # Add your connection pool settings here
+#    hikari:
+#      maximum-pool-size: 10
+#      minimum-idle: 3
+#      idle-timeout: 300000 # 5 minutes
+#      max-lifetime: 1200000 # 20 minutes
+#      connection-timeout: 20000 # 20 seconds
   jpa:
     hibernate:
       ddl-auto: update
@@ -21,8 +28,10 @@ spring:
 
 app:
   security:
-    cookie-hash-key: ${COOKIE_HASH_KEY:change-me-to-32-byte-secret-key!}
+    cookie-hash-key: ${COOKIE_HASH_KEY:cookie-hash-key-example}
     session-duration-hours: 720
+  admin:
+    email: ${ADMIN_EMAIL:artursbm@hotmail.com}
   scoring:
     exact: ${SCORE_EXACT:4}
     winner-diff: ${SCORE_WINNER_DIFF:3}
@@ -30,5 +39,5 @@ app:
     draw: ${SCORE_DRAW:1}
 
 football-data:
-  api-token: ${FOOTBALL_DATA_API_TOKEN:}
+  api-token: ${FOOTBALL_DATA_API_TOKEN:80ac15f68c254ceb86ab01c1e9d2875c}
   competition-id: ${FOOTBALL_DATA_COMPETITION_ID:2000}
