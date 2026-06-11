@@ -46,19 +46,56 @@
     let matches = $state<Match[]>([]);
     let loading = $state(true);
 
-    onMount(async () => {
-        try {
-            await Promise.all([
-                fetchUpcomingMatches().then((m) => (matches = m)),
-                rankingStore.fetch(),
-            ]);
-            backendStatus = "Online";
-        } catch (e) {
-            console.error("Failed to load data", e);
-            backendStatus = "Offline";
-        } finally {
-            loading = false;
+    onMount(() => {
+        let eventSource: EventSource | null = null;
+
+        async function init() {
+            try {
+                await Promise.all([
+                    fetchUpcomingMatches().then((m) => (matches = m)),
+                    rankingStore.fetch(),
+                ]);
+                backendStatus = "Online";
+
+                eventSource = new EventSource('/api/stream/matches');
+                eventSource.addEventListener('connected', () => {
+                    backendStatus = "Online (Streaming)";
+                });
+                eventSource.onerror = (e) => {
+                    console.error("SSE Error", e);
+                    backendStatus = "Online (Reconnect...)";
+                };
+                eventSource.addEventListener('match-updated', (event) => {
+                    try {
+                        const updatedMatch = JSON.parse(event.data);
+                        const index = matches.findIndex(m => m.id === updatedMatch.id);
+                        if (index !== -1) {
+                            matches[index] = updatedMatch;
+                        } else {
+                            matches.push(updatedMatch);
+                        }
+                    } catch(err) {
+                        console.error('Error parsing match update', err);
+                    }
+                });
+                eventSource.addEventListener('ranking-updated', () => {
+                    rankingStore.fetch();
+                });
+            } catch (e) {
+                console.error("Failed to load data", e);
+                backendStatus = "Offline";
+            } finally {
+                loading = false;
+            }
         }
+
+        init();
+
+        return () => {
+            if (eventSource) {
+                eventSource.close();
+            }
+        };
     });
 
     const topRankings = $derived($rankingStore.data.slice(0, 3));
