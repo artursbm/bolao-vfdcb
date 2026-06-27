@@ -60,8 +60,7 @@ public class FootballDataSyncService {
 
     public void processMatches(CompetitionMatchesResponse response) {
         if (response != null && response.matches() != null) {
-            for (MatchDto matchDto : response.matches()
-                    .stream().filter(m -> "GROUP_STAGE".equals(m.stage())).toList()) {
+            for (MatchDto matchDto : response.matches()) {
                 // this is not performatic, I'm querying teams every time to fill match data.
                 // TODO Could bring all teams once and map them via in-memory
                 Team homeTeam = getTeam(matchDto.homeTeam());
@@ -126,7 +125,7 @@ public class FootballDataSyncService {
         if (dto == null || dto.id() == null) return;
 
         Match match = matchRepository.findByExternalId(dto.id()).orElse(new Match());
-        if (match.getUpdatedAt().isBefore(dto.lastUpdated().toInstant())) {
+        if (match.getUpdatedAt() == null || (dto.lastUpdated() != null && match.getUpdatedAt().isBefore(dto.lastUpdated().toInstant()))) {
 
             match.setExternalId(dto.id());
             match.setHomeTeam(homeTeam);

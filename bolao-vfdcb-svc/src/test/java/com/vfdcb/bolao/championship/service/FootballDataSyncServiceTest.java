@@ -75,7 +75,8 @@ class FootballDataSyncServiceTest {
                 homeTeamDto,
                 awayTeamDto,
                 scoreDto,
-                "GROUP_STAGE");
+                "GROUP_STAGE",
+                ZonedDateTime.now());
 
         CompetitionMatchesResponse response = new CompetitionMatchesResponse(List.of(matchDto));
 
@@ -129,7 +130,7 @@ class FootballDataSyncServiceTest {
         scoreDetail.setAway(1);
         scoreDto.setFullTime(scoreDetail);
 
-        MatchDto matchDto = new MatchDto(100L, ZonedDateTime.now(), "FINISHED", homeTeamDto, awayTeamDto, scoreDto, "GROUP_STAGE");
+        MatchDto matchDto = new MatchDto(100L, ZonedDateTime.now(), "FINISHED", homeTeamDto, awayTeamDto, scoreDto, "GROUP_STAGE", ZonedDateTime.now());
         CompetitionMatchesResponse response = new CompetitionMatchesResponse(List.of(matchDto));
 
         Team t1 = new Team("Brazil", "BRA");

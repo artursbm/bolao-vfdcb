@@ -20,11 +20,11 @@ public class Match {
     private Long externalId;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "home_team_id")
+    @JoinColumn(name = "home_team_id", nullable = true)
     private Team homeTeam;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "away_team_id")
+    @JoinColumn(name = "away_team_id", nullable = true)
     private Team awayTeam;
 
     @Column(name = "match_time", nullable = false)
