@@ -279,19 +279,19 @@
                                             <div
                                                 style="font-weight: 700; font-size: 1.25rem; align-items: center; justify-content: flex-start;"
                                             >
-                                                {#if match.home_team.crest}
+                                                {#if match.home_team?.crest}
                                                     <img
                                                         src={match.home_team.crest}
-                                                        alt={match.home_team.name}
+                                                        alt={match.home_team?.name ?? "A definir"}
                                                         style="width: 1.25rem; height: 1.25rem; object-fit: contain;"
                                                     />
                                                 {/if}
-                                                <span>{match.home_team.code}</span>
+                                                <span>{match.home_team?.code ?? "TBD"}</span>
                                             </div>
                                             <div
                                                 style="color: var(--color-text-muted); font-size: 0.725rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
                                             >
-                                                {match.home_team.name}
+                                                {match.home_team?.name ?? "A definir"}
                                             </div>
                                         </div>
 
@@ -325,19 +325,19 @@
                                             <div
                                                 style="font-weight: 700; font-size: 1.25rem; align-items: center; justify-content: flex-start;"
                                             >
-                                                {#if match.away_team.crest}
+                                                {#if match.away_team?.crest}
                                                     <img
                                                         src={match.away_team.crest}
-                                                        alt={match.away_team.name}
+                                                        alt={match.away_team?.name ?? "A definir"}
                                                         style="width: 1.25rem; height: 1.25rem; object-fit: contain;"
                                                     />
                                                 {/if}
-                                                <span>{match.away_team.code}</span>
+                                                <span>{match.away_team?.code ?? "TBD"}</span>
                                             </div>
                                             <div
                                                 style="color: var(--color-text-muted); font-size: 0.725rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
                                             >
-                                                {match.away_team.name}
+                                                {match.away_team?.name ?? "A definir"}
                                             </div>
                                         </div>
                                     </div>
