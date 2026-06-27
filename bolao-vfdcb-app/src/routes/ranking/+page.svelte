@@ -86,7 +86,8 @@
 
     .table-container {
         padding: 0;
-        overflow: hidden;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
     }
 
     .ranking-table {
@@ -162,5 +163,54 @@
 
     @keyframes spin {
         to { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 640px) {
+        .container {
+            padding: 2rem 0.5rem !important;
+        }
+
+        .card {
+            padding: 1rem;
+        }
+
+        header h1 {
+            font-size: 2rem !important;
+        }
+
+        .ranking-table {
+            min-width: 320px;
+        }
+
+        .ranking-table th {
+            padding: 0.75rem 0.5rem;
+            font-size: 0.75rem;
+        }
+
+        .ranking-table td {
+            padding: 0.75rem 0.5rem;
+        }
+
+        .rank-badge {
+            width: 28px;
+            height: 28px;
+            font-size: 0.75rem;
+        }
+
+        .user-name {
+            font-size: 0.85rem;
+        }
+
+        /* Adjust column widths on mobile to reduce separation */
+        .ranking-table th:first-child,
+        .ranking-table td:first-child {
+            width: 50px !important;
+        }
+        
+        .ranking-table th:last-child,
+        .ranking-table td:last-child {
+            width: 60px !important;
+            text-align: right;
+        }
     }
 </style>
