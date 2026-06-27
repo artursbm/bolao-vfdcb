@@ -44,17 +44,28 @@
     let loading = $state(true);
     let guesses = $state<GuessWithMatch[]>([]);
 
-    // Group guesses by calendar date (BRT timezone)
-    const guessesByDate = $derived.by(() => {
+    // Helper to group and sort guesses
+    function groupAndSortGuesses(list: GuessWithMatch[], reverse: boolean = false) {
         const map = new Map<string, { label: string; items: GuessWithMatch[] }>();
-        for (const item of guesses) {
+        for (const item of list) {
             const key = formatDateKey(item.match.match_time);
             if (!map.has(key)) {
                 map.set(key, { label: formatDateLabel(item.match.match_time), items: [] });
             }
             map.get(key)!.items.push(item);
         }
-        return [...map.entries()].sort(([a], [b]) => a.localeCompare(b));
+        const sorted = [...map.entries()].sort(([a], [b]) => a.localeCompare(b));
+        return reverse ? sorted.reverse() : sorted;
+    }
+
+    // Group upcoming/live guesses
+    const upcomingGuessesByDate = $derived.by(() => {
+        return groupAndSortGuesses(guesses.filter(g => g.match.status !== "FINISHED"));
+    });
+
+    // Group past/finished guesses
+    const pastGuessesByDate = $derived.by(() => {
+        return groupAndSortGuesses(guesses.filter(g => g.match.status === "FINISHED"), true);
     });
 
     // UI state
@@ -174,8 +185,15 @@
             Nenhuma partida encontrada.
         </div>
     {:else}
-        <div style="display: flex; flex-direction: column; gap: 2.5rem;">
-            {#each guessesByDate as [_key, group]}
+        <div style="display: flex; flex-direction: column; gap: 4rem;">
+            {#each [
+                { title: "Próximas Partidas", data: upcomingGuessesByDate },
+                { title: "Partidas Encerradas", data: pastGuessesByDate }
+            ] as section}
+                {#if section.data.length > 0}
+                    <div style="display: flex; flex-direction: column; gap: 2.5rem;">
+                        <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--color-text); padding-bottom: 0.5rem; margin-bottom: -1rem; margin-top: 0;">{section.title}</h2>
+                        {#each section.data as [_key, group]}
                 <div class="date-group">
                     <div class="date-header">
                         <div class="date-header-line"></div>
@@ -380,6 +398,9 @@
                         {/each}
                     </div>
                 </div>
+                        {/each}
+                    </div>
+                {/if}
             {/each}
         </div>
     {/if}
