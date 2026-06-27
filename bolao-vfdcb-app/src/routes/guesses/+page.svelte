@@ -6,6 +6,7 @@
         fetchUserGuesses,
         submitGuess,
         statusLabel,
+        translateStage,
         type GuessWithMatch,
     } from "$lib/championship";
 
@@ -197,11 +198,16 @@
                                     <span class="badge {getBadgeClass(item.match.status)}">
                                         {statusLabel(item.match.status)}
                                     </span>
-                                    <span
-                                        style="font-size: 0.875rem; color: var(--color-text-muted);"
+                                    <div
+                                        style="font-size: 0.875rem; color: var(--color-text-muted); text-align: right;"
                                     >
-                                        {formatTimeOnly(item.match.match_time)}
-                                    </span>
+                                        <div>{formatTimeOnly(item.match.match_time)}</div>
+                                        {#if item.match.stage}
+                                            <div style="font-size: 0.725rem; margin-top: 0.25rem;">
+                                                {translateStage(item.match.stage)}
+                                            </div>
+                                        {/if}
+                                    </div>
                                 </div>
 
                                 <!-- Layout for teams and score/form -->

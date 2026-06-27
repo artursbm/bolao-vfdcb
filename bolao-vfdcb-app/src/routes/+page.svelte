@@ -6,6 +6,7 @@
         fetchUpcomingMatches,
         formatMatchTime,
         statusLabel,
+        translateStage,
         type Match,
     } from "$lib/championship";
 
@@ -350,6 +351,11 @@
                                         >
                                             {formatTimeOnly(match.match_time)}
                                         </div>
+                                        {#if match.stage}
+                                            <div style="font-size: 0.725rem; color: var(--color-text-muted); margin-top: 0.25rem;">
+                                                {translateStage(match.stage)}
+                                            </div>
+                                        {/if}
                                     </div>
                                 </div>
                             {/each}

@@ -40,6 +40,9 @@ public class Match {
     @Column(nullable = false)
     private MatchStatus status;
 
+    @Column(name = "stage")
+    private String stage;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
@@ -137,5 +140,13 @@ public class Match {
 
     public void setUpdatedAt(Instant updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public String getStage() {
+        return stage;
+    }
+
+    public void setStage(String stage) {
+        this.stage = stage;
     }
 }

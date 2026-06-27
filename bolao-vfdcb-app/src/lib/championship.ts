@@ -17,6 +17,7 @@ export interface Match {
     home_score: number | null;
     away_score: number | null;
     status: 'TIMED' | 'IN_PLAY' | 'IN_PLAY' | 'PAUSED' | 'FINISHED';
+    stage?: string;
     created_at: string;
     updated_at: string;
 }
@@ -89,5 +90,19 @@ export function statusLabel(status: Match['status']): string {
         case 'IN_PLAY': return 'Em andamento';
         case 'PAUSED': return 'Interrompido';
         case 'FINISHED': return 'Finalizado';
+    }
+}
+
+export function translateStage(stage?: string): string {
+    if (!stage) return '';
+    switch (stage) {
+        case 'GROUP_STAGE': return 'Fase de grupos';
+        case 'LAST_32': return '16 avos de final';
+        case 'LAST_16': return 'Oitavas de final';
+        case 'QUARTER_FINALS': return 'Quartas de final';
+        case 'SEMI_FINALS': return 'Semifinais';
+        case 'FINAL': return 'Final';
+        case 'THIRD_PLACE': return 'Disputa do 3º lugar';
+        default: return stage;
     }
 }

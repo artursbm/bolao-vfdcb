@@ -125,11 +125,16 @@ public class FootballDataSyncService {
         if (dto == null || dto.id() == null) return;
 
         Match match = matchRepository.findByExternalId(dto.id()).orElse(new Match());
-        if (match.getUpdatedAt() == null || (dto.lastUpdated() != null && match.getUpdatedAt().isBefore(dto.lastUpdated().toInstant()))) {
+        if (match.getStage() == null || match.getUpdatedAt() == null ||
+                (dto.lastUpdated() != null && match.getUpdatedAt().isBefore(dto.lastUpdated().toInstant()))) {
 
             match.setExternalId(dto.id());
             match.setHomeTeam(homeTeam);
             match.setAwayTeam(awayTeam);
+
+            if (dto.stage() != null) {
+                match.setStage(dto.stage());
+            }
 
             if (dto.utcDate() != null) {
                 match.setMatchTime(dto.utcDate());
